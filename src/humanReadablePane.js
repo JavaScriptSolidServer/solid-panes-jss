@@ -3,7 +3,7 @@
  **  This outline pane contains the document contents for an HTML document
  **  This is for peeking at a page, because the user might not want to leave the data browser.
  */
-import { icons, ns } from 'solid-ui'
+import { icons, ns } from 'solid-ui-jss'
 import { Util } from 'rdflib'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'

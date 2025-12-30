@@ -1,5 +1,5 @@
-import { authSession, authn } from 'solid-logic'
-import { icons, initHeader } from 'solid-ui'
+import { authSession, authn } from 'solid-logic-jss'
+import { icons, initHeader } from 'solid-ui-jss'
 /**
  * menu icons
 */

@@ -1,7 +1,7 @@
 /*   slideshow Pane
  **
  */
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 
 import makeBSS from '@solid/better-simple-slideshow'
 const ns = UI.ns

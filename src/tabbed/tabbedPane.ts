@@ -5,7 +5,7 @@
  */
 import { Store } from 'rdflib'
 import { PaneDefinition } from 'pane-registry'
-import { icons, ns, tabs, widgets } from 'solid-ui'
+import { icons, ns, tabs, widgets } from 'solid-ui-jss'
 
 const TabbedPane: PaneDefinition = {
   icon: icons.iconBase + 'noun_688606.svg',

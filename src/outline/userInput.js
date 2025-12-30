@@ -11,8 +11,8 @@
     request: 'from' 'to' 'message' 'Request'
 */
 
-import * as UI from 'solid-ui'
-import { store } from 'solid-logic'
+import * as UI from 'solid-ui-jss'
+import { store } from 'solid-logic-jss'
 import * as panes from 'pane-registry'
 import * as $rdf from 'rdflib'
 

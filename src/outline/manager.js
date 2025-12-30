@@ -4,8 +4,8 @@
 */
 import * as paneRegistry from 'pane-registry'
 import * as $rdf from 'rdflib'
-import * as UI from 'solid-ui'
-import { authn, authSession, store } from 'solid-logic'
+import * as UI from 'solid-ui-jss'
+import { authn, authSession, store } from 'solid-logic-jss'
 import { propertyViews } from './propertyViews'
 import { outlineIcons } from './outlineIcons.js' // @@ chec
 import { UserInput } from './userInput.js'

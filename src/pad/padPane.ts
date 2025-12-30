@@ -1,5 +1,5 @@
-import { icons, ns, pad, widgets, login } from 'solid-ui'
-import { authn, AppDetails } from 'solid-logic'
+import { icons, ns, pad, widgets, login } from 'solid-ui-jss'
+import { authn, AppDetails } from 'solid-logic-jss'
 import { graph, log, NamedNode, Namespace, sym, serialize, Store } from 'rdflib'
 import { PaneDefinition } from 'pane-registry'
 /*   pad Pane

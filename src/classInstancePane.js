@@ -3,7 +3,7 @@
  **  This outline pane lists the members of a class
  */
 
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 
 const ns = UI.ns

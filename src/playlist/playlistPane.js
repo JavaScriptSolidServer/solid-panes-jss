@@ -3,7 +3,7 @@
  **  This pane allows playlists and playlists slots to be viewed
  **  seeAlso: http://smiy.sourceforge.net/pbo/spec/playbackontology.html
  */
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 const ns = UI.ns
 

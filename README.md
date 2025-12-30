@@ -1,6 +1,6 @@
-# solid-panes
+# solid-panes-jss
 
-A set of core solid-compatible applets based on solid-ui
+A set of core solid-compatible applets based on solid-ui-jss (JSS variant with minimal solid-oidc authentication)
 
 These are a set of interlinked applications, or parts of applications,
 which called 'panes' -- as in parts of a window. A pane displays a data object of certain class using part of the window.
@@ -29,7 +29,7 @@ Currently the panes available include:
 - and so on
 
 The solid-app-set panes are built using a set of widgets and utilities in
-[https://github.com/linkeddata/solid-ui](https://github.com/linkeddata/solid-ui)
+[https://github.com/JavaScriptSolidServer/solid-ui-jss](https://github.com/JavaScriptSolidServer/solid-ui-jss)
 
 To help onboarding, we're using [roles](https://github.com/solidos/userguide/#role) to limit the number of panes presented
 to new users.
@@ -55,8 +55,8 @@ To get started, make sure you have Node.js installed (for instance
 through https://github.com/nvm-sh/nvm), and:
 1. run
 ```sh
-git clone https://github.com/solidos/solid-panes
-cd solid-panes
+git clone https://github.com/JavaScriptSolidServer/solid-panes-jss
+cd solid-panes-jss
 npm install
 npm run start
 ```
@@ -78,3 +78,7 @@ contacts (A VCARD Address Book, Group, Individual, Organization) can be handled 
 pane. Any other pane which wants to deal with contacts can just use the pane within its own user interface.
 
 ![Mapping many classes on the L to panes on the R](https://solidos.github.io/solid-panes/doc/images/panes-for-classes.svg)
+
+## Credits
+
+This is a fork of [solidos/solid-panes](https://github.com/solidos/solid-panes) with the authentication replaced from `@inrupt/solid-client-authn-browser` to the minimal [solid-oidc](https://github.com/JavaScriptSolidServer/solid-oidc) library via [solid-logic-jss](https://github.com/JavaScriptSolidServer/solid-logic-jss) and [solid-ui-jss](https://github.com/JavaScriptSolidServer/solid-ui-jss).

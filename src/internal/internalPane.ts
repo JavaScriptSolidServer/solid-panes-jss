@@ -5,7 +5,7 @@
  */
 /* global alert confirm */
 
-import { icons, ns, widgets } from 'solid-ui'
+import { icons, ns, widgets } from 'solid-ui-jss'
 import { BlankNode, IndexedFormula, literal, NamedNode, st, sym, Variable, Store } from 'rdflib'
 import { PaneDefinition } from 'pane-registry'
 

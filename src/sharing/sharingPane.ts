@@ -8,7 +8,7 @@
  ** like "this" where the string is seen by the user and so I18n is an issue.
  */
 
-import { aclControl, icons, ns } from 'solid-ui'
+import { aclControl, icons, ns } from 'solid-ui-jss'
 
 const sharingPane = {
   icon: icons.iconBase + 'padlock-timbl.svg',

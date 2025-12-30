@@ -5,7 +5,7 @@
  ** trips, etc
  */
 
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 const ns = UI.ns
 
 export default {

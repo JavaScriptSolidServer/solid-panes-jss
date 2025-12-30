@@ -1,6 +1,6 @@
 import { DataBrowserContext, PaneRegistry } from 'pane-registry'
 import { getOutliner } from '../index'
-import { SolidLogic } from 'solid-logic'
+import { SolidLogic } from 'solid-logic-jss'
 import { LiveStore } from 'rdflib'
 
 export function createContext (

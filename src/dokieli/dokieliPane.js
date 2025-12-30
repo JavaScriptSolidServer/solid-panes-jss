@@ -5,7 +5,7 @@
  ** review.   It does not use turtle, but RDF/a
  */
 
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 import * as mime from 'mime-types'
 

@@ -10,8 +10,8 @@
  ** or standalone script adding onto existing mashlib.
  */
 
-// import UI from 'solid-ui'
-// import solidUi, { SolidUi } from 'solid-ui'
+// import UI from 'solid-ui-jss'
+// import solidUi, { SolidUi } from 'solid-ui-jss'
 // @@ TODO: Write away the need for exception on next line
 
 const thisPane = { foo: 'bar' }

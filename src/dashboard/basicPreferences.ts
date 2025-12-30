@@ -1,6 +1,6 @@
 import { PaneDefinition } from 'pane-registry'
 import { IndexedFormula, NamedNode, parse, Store } from 'rdflib'
-import { icons, login, ns, widgets } from 'solid-ui'
+import { icons, login, ns, widgets } from 'solid-ui-jss'
 import ontologyData from './ontologyData.ttl'
 import preferencesFormText from './preferencesFormText.ttl'
 

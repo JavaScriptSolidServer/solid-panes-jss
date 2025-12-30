@@ -3,8 +3,8 @@
  Charles McKenzie <charles2@mit.edu>
 */
 /* global alert */
-import { authn, store } from 'solid-logic'
-import * as UI from 'solid-ui'
+import { authn, store } from 'solid-logic-jss'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 
 export default {

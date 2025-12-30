@@ -6,8 +6,8 @@
 ** Should allow editing the data too
 
 */
-import { store } from 'solid-logic'
-import * as UI from 'solid-ui'
+import { store } from 'solid-logic-jss'
+import * as UI from 'solid-ui-jss'
 import * as panes from 'pane-registry'
 
 // console.log('@@@ argument pane icon at ' + (module.__dirname || __dirname) + '/icon_argument.png')

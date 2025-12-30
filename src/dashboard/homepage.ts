@@ -1,5 +1,5 @@
 import { Fetcher, IndexedFormula, NamedNode, sym } from 'rdflib'
-import { ns } from 'solid-ui'
+import { ns } from 'solid-ui-jss'
 
 export async function generateHomepage (
   subject: NamedNode,

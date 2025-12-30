@@ -4,7 +4,7 @@
  ** or at least the RDF semantics we attribute to that resource,
  ** in generated N3 syntax.
  */
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 
 const ns = UI.ns

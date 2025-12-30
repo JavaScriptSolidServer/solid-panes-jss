@@ -1,4 +1,4 @@
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 
 export default (dom) => function viewAsImage (obj) {
   const img = UI.utils.AJARImage(

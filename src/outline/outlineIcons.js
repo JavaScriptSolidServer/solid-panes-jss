@@ -1,6 +1,6 @@
 // This is a system of tracking tooltip phrases used by the tabulator outliner
 
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 
 export const outlineIcons = {}
 

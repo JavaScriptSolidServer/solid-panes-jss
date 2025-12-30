@@ -1,4 +1,4 @@
-import { ns } from 'solid-ui'
+import { ns } from 'solid-ui-jss'
 import viewAsImage from './viewAsImage'
 import viewAsMbox from './viewAsMbox'
 

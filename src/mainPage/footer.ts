@@ -1,5 +1,5 @@
 import { LiveStore } from 'rdflib'
-import { initFooter } from 'solid-ui'
+import { initFooter } from 'solid-ui-jss'
 
 /**
  * links in the footer

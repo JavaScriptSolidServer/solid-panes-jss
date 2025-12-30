@@ -6,8 +6,8 @@
 // to find all other places which had the same pattern.
 // Fields could be optional by pressing th ewhite optoional button
 
-import { store } from 'solid-logic'
-import * as UI from 'solid-ui'
+import { store } from 'solid-logic-jss'
+import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
 
 const optionalSubqueriesIndex = []

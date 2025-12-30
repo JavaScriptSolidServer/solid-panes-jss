@@ -3,8 +3,8 @@
  **
  */
 
-import * as UI from 'solid-ui'
-import { authn } from 'solid-logic'
+import * as UI from 'solid-ui-jss'
+import { authn } from 'solid-logic-jss'
 import * as $rdf from 'rdflib'
 const ns = UI.ns
 

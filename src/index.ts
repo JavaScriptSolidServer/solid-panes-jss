@@ -11,9 +11,9 @@
  */
 
 import versionInfo from './versionInfo'
-import * as UI from 'solid-ui'
+import * as UI from 'solid-ui-jss'
 import { LiveStore } from 'rdflib'
-import { solidLogicSingleton, store } from 'solid-logic'
+import { solidLogicSingleton, store } from 'solid-logic-jss'
 import OutlineManager from './outline/manager.js'
 import { registerPanes } from './registerPanes.js'
 import {

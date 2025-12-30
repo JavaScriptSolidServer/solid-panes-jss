@@ -1,7 +1,7 @@
 {
-  "name": "solid-panes",
-  "version": "4.0.0",
-  "description": "Solid-compatible Panes: applets and views for the mashlib and databrowser",
+  "name": "solid-panes-jss",
+  "version": "4.0.1",
+  "description": "Solid-compatible Panes (JSS variant with minimal solid-oidc authentication)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
@@ -34,7 +34,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/solidos/solid-panes.git"
+    "url": "git+https://github.com/JavaScriptSolidServer/solid-panes-jss.git"
   },
   "keywords": [
     "solid",
@@ -52,9 +52,9 @@
   "author": "Tim Berners-Lee <timbl@mit.edu>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/solidos/solid-panes/issues"
+    "url": "https://github.com/JavaScriptSolidServer/solid-panes-jss/issues"
   },
-  "homepage": "https://github.com/solidos/solid-panes",
+  "homepage": "https://github.com/JavaScriptSolidServer/solid-panes-jss",
   "dependencies": {
     "@solid/better-simple-slideshow": "^0.1.0",
     "activitystreams-pane": "^1.0.0",
@@ -73,8 +73,8 @@
   },
   "overrides": {
     "rdflib": "$rdflib",
-    "solid-logic": "$solid-logic",
-    "solid-ui": "$solid-ui"
+    "solid-logic": "npm:solid-logic-jss@github:JavaScriptSolidServer/solid-logic-jss",
+    "solid-ui": "npm:solid-ui-jss@github:JavaScriptSolidServer/solid-ui-jss"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.0",
@@ -103,8 +103,8 @@
     "rdflib": "^2.3.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "solid-logic": "^4.0.0",
-    "solid-ui": "^3.0.0",
+    "solid-logic-jss": "github:JavaScriptSolidServer/solid-logic-jss",
+    "solid-ui-jss": "github:JavaScriptSolidServer/solid-ui-jss",
     "ts-jest": "^29.4.1",
     "typescript": "^5.9.2",
     "webpack": "^5.101.0",
