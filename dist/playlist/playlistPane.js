@@ -1,0 +1,124 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var UI = _interopRequireWildcard(require("solid-ui-jss"));
+var $rdf = _interopRequireWildcard(require("rdflib"));
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+/*   Playlist Pane
+ **
+ **  This pane allows playlists and playlists slots to be viewed
+ **  seeAlso: http://smiy.sourceforge.net/pbo/spec/playbackontology.html
+ */
+
+const ns = UI.ns;
+var _default = exports.default = {
+  icon: UI.icons.iconBase + 'noun_1619.svg',
+  name: 'playlistSlot',
+  audience: [ns.solid('PowerUser')],
+  label: function (subject, context) {
+    const kb = context.session.store;
+    if (!kb.anyStatementMatching(subject, UI.ns.rdf('type'), kb.sym('http://purl.org/ontology/pbo/core#PlaylistSlot'))) {
+      return null;
+    }
+    return 'playlist slot';
+  },
+  render: function (subject, context) {
+    const myDocument = context.dom;
+    function isVideo(src, _index) {
+      if (!src) {
+        return {
+          html5: true
+        };
+      }
+      const youtube = src.match(/\/\/(?:www\.)?youtu(?:\.be|be\.com)\/(?:watch\?v=|embed\/)?([a-z0-9\-_%]+)/i);
+      const vimeo = src.match(/\/\/(?:www\.)?vimeo.com\/([0-9a-z\-_]+)/i);
+      const dailymotion = src.match(/\/\/(?:www\.)?dai.ly\/([0-9a-z\-_]+)/i);
+      const vk = src.match(/\/\/(?:www\.)?(?:vk\.com|vkontakte\.ru)\/(?:video_ext\.php\?)(.*)/i);
+      if (youtube) {
+        return {
+          youtube
+        };
+      } else if (vimeo) {
+        return {
+          vimeo
+        };
+      } else if (dailymotion) {
+        return {
+          dailymotion
+        };
+      } else if (vk) {
+        return {
+          vk
+        };
+      }
+    }
+    const link = function (contents, uri) {
+      if (!uri) return contents;
+      const a = myDocument.createElement('a');
+      a.setAttribute('href', uri);
+      a.appendChild(contents);
+      a.addEventListener('click', UI.widgets.openHrefInOutlineMode, true);
+      return a;
+    };
+    const text = function (str) {
+      return myDocument.createTextNode(str);
+    };
+    const kb = context.session.store;
+    const obj = kb.any(subject, $rdf.sym('http://purl.org/ontology/pbo/core#playlist_item'));
+    let index = kb.any(subject, $rdf.sym('http://purl.org/ontology/olo/core#index'));
+    let uri = obj.uri;
+    const video = isVideo(uri);
+    const div = myDocument.createElement('div');
+    let img;
+    if (video && video.youtube) {
+      uri = uri.replace('watch?v=', 'embed/');
+      div.setAttribute('class', 'imageView');
+      img = myDocument.createElement('IFRAME');
+      img.setAttribute('src', uri);
+      img.setAttribute('width', 560);
+      img.setAttribute('height', 315);
+      img.setAttribute('frameborder', 0);
+      img.setAttribute('style', 'max-width: 850px; max-height: 100%;');
+      img.setAttribute('allowfullscreen', 'true');
+    } else {
+      div.setAttribute('class', 'imageView');
+      img = myDocument.createElement('IMG');
+      img.setAttribute('src', obj.value);
+      img.setAttribute('width', 560);
+      img.setAttribute('height', 315);
+      img.setAttribute('style', 'max-width: 560; max-height: 315;');
+    }
+    let descDiv;
+    if (index) {
+      const sl = kb.statementsMatching(null, $rdf.sym('http://purl.org/ontology/olo/core#index'));
+      const slots = [];
+      for (let i = 0; i < sl.length; i++) {
+        if (sl[i]) {
+          slots.push(parseInt(sl[i].object.value, 10));
+        }
+      }
+      index = parseInt(index.value, 10);
+      descDiv = myDocument.createElement('div');
+      const pIndex = slots[(slots.indexOf(index) - 1 + slots.length) % slots.length];
+      const nIndex = slots[(slots.indexOf(index) + 1 + slots.length) % slots.length];
+      const prev = link(text('<<'), subject.uri.split('#')[0] + '#' + pIndex);
+      descDiv.appendChild(prev);
+      const indexDiv = myDocument.createElement('span');
+      indexDiv.innerHTML = ' Playlist slot : ' + index + ' ';
+      descDiv.appendChild(indexDiv);
+      const next = link(text('>>'), subject.uri.split('#')[0] + '#' + nIndex);
+      descDiv.appendChild(next);
+    }
+    const tr = myDocument.createElement('TR'); // why need tr?
+    tr.appendChild(img);
+    if (descDiv) {
+      tr.appendChild(descDiv);
+    }
+    div.appendChild(tr);
+    return div;
+  }
+}; // ends
+//# sourceMappingURL=playlistPane.js.map

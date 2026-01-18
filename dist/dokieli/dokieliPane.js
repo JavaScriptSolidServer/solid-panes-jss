@@ -1,0 +1,169 @@
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = void 0;
+var UI = _interopRequireWildcard(require("solid-ui-jss"));
+var $rdf = _interopRequireWildcard(require("rdflib"));
+var mime = _interopRequireWildcard(require("../utils/mimeTypes"));
+var _new = _interopRequireDefault(require("./new.js"));
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+/*   Human-readable editable "Dokieli" Pane
+ **
+ **  This outline pane contains the document contents for a Dokieli document
+ ** The dokeili system allows the user to edit a document including anotations
+ ** review.   It does not use turtle, but RDF/a
+ */
+// const DOKIELI_TEMPLATE_URI = 'https://dokie.li/new' // Copy to make new dok
+// Distributed with this library
+var _default = exports.default = {
+  icon: UI.icons.iconBase + 'dokieli-logo.png',
+  // @@ improve? more like doccument?
+
+  name: 'Dokieli',
+  mintClass: UI.ns.solid('DokieliDocument'),
+  // @@ A better class?
+
+  label: function (subject, context) {
+    const kb = context.session.store;
+    const ns = UI.ns;
+    const allowed = [
+    // 'text/plain',
+    'text/html', 'application/xhtml+xml'
+    // 'image/png', 'image/jpeg', 'application/pdf',
+    // 'video/mp4'
+    ];
+    const hasContentTypeIn = function (kb, x, displayables) {
+      const cts = kb.fetcher.getHeader(x, 'content-type');
+      if (cts) {
+        for (let j = 0; j < cts.length; j++) {
+          for (let k = 0; k < displayables.length; k++) {
+            if (cts[j].indexOf(displayables[k]) >= 0) {
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    };
+
+    // This data coul d come from a fetch OR from ldp comtaimner
+    const hasContentTypeIn2 = function (kb, x, displayables) {
+      const t = kb.findTypeURIs(x);
+      for (let k = 0; k < displayables.length; k++) {
+        if ($rdf.Util.mediaTypeClass(displayables[k]).uri in t) {
+          return true;
+        }
+      }
+      return false;
+    };
+    if (!subject.uri) return null; // no bnodes
+
+    const t = kb.findTypeURIs(subject);
+    if (t[ns.link('WebPage').uri]) return 'view';
+    if (hasContentTypeIn(kb, subject, allowed) || hasContentTypeIn2(kb, subject, allowed)) {
+      return 'Dok';
+    }
+    return null;
+  },
+  // Create a new folder in a Solid system, with a dokieli editable document in it
+  mintNew: function (context, newPaneOptions) {
+    const kb = context.session.store;
+    let newInstance = newPaneOptions.newInstance;
+    if (!newInstance) {
+      let uri = newPaneOptions.newBase;
+      if (uri.endsWith('/')) {
+        uri = uri.slice(0, -1);
+        newPaneOptions.newBase = uri;
+      }
+      newInstance = kb.sym(uri);
+    }
+    const contentType = mime.lookup(newInstance.uri);
+    if (!contentType || !contentType.includes('html')) {
+      newInstance = $rdf.sym(newInstance.uri + '.html');
+    }
+    newPaneOptions.newInstance = newInstance; // Save for creation system
+
+    // console.log('New dokieli will make: ' + newInstance)
+
+    let htmlContents = _new.default;
+    let filename = newInstance.uri.split('/').slice(-1)[0];
+    filename = decodeURIComponent(filename.split('.')[0]);
+    const encodedTitle = filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    htmlContents = htmlContents.replace('<title>', '<title>' + encodedTitle);
+    htmlContents = htmlContents.replace('</article>', '<h1>' + encodedTitle + '</h1></article>');
+    // console.log('@@ New HTML for Dok:' + htmlContents)
+    return new Promise(function (resolve) {
+      kb.fetcher.webOperation('PUT', newInstance.uri, {
+        data: htmlContents,
+        contentType: 'text/html'
+      }).then(function () {
+        console.log('new Dokieli document created at ' + newPaneOptions.newInstance);
+        resolve(newPaneOptions);
+      }).catch(function (err) {
+        console.log('Error creating dokieli doc at ' + newPaneOptions.newInstance + ': ' + err);
+      });
+    });
+  },
+  // Derived from: humanReadablePane .. share code?
+  render: function (subject, context) {
+    const myDocument = context.dom;
+    const div = myDocument.createElement('div');
+    const kb = context.session.store;
+
+    //  @@ When we can, use CSP to turn off scripts within the iframe
+    div.setAttribute('class', 'docView');
+    const iframe = myDocument.createElement('IFRAME');
+
+    // Function to set iframe attributes
+    const setIframeAttributes = (iframe, blob, lines) => {
+      const objectURL = URL.createObjectURL(blob);
+      iframe.setAttribute('src', objectURL);
+      iframe.setAttribute('type', blob.type);
+      iframe.setAttribute('class', 'doc');
+      iframe.setAttribute('style', `border: 1px solid; padding: 1em; height:${lines}em; width:800px; resize: both; overflow: auto;`);
+
+      // Apply sandbox attribute only for HTML files
+      // @@ NOte beflow - if we set ANY sandbox, then Chrome and Safari won't display it if it is PDF.
+      // https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe
+      // You can;'t have any sandbox and allow plugins.
+      // We could sandbox only HTML files I suppose.
+      // HTML5 bug: https://lists.w3.org/Archives/Public/public-html/2011Jun/0330.html
+      if (blob.type === 'text/html' || blob.type === 'application/xhtml+xml') {
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+      }
+    };
+
+    // Fetch and process the blob
+    kb.fetcher._fetch(subject.uri).then(response => response.blob()).then(blob => {
+      const blobTextPromise = blob.type.startsWith('text') ? blob.text() : Promise.resolve('');
+      return blobTextPromise.then(blobText => ({
+        blob,
+        blobText
+      }));
+    }).then(({
+      blob,
+      blobText
+    }) => {
+      const newLines = blobText.includes('<script src="https://dokie.li/scripts/dokieli.js">') ? -10 : 5;
+      const lines = Math.min(30, blobText.split(/\n/).length + newLines);
+      setIframeAttributes(iframe, blob, lines);
+    }).catch(err => {
+      console.log('Error fetching or processing blob:', err);
+    });
+    const cts = kb.fetcher.getHeader(subject.doc(), 'content-type');
+    const ct = cts ? cts[0].split(';', 1)[0].trim() : null;
+    if (ct) {
+      console.log('dokieliPane: c-t:' + ct);
+    } else {
+      console.log('dokieliPane: unknown content-type?');
+    }
+    const tr = myDocument.createElement('tr');
+    tr.appendChild(iframe);
+    div.appendChild(tr);
+    return div;
+  }
+}; // ends
+//# sourceMappingURL=dokieliPane.js.map
