@@ -4,6 +4,7 @@
  * This file is lazy-loaded only when the user views a bookmark.
  * It contains all the heavy logic: UI rendering, RDF queries, updates.
  */
+/* global confirm, alert */
 
 import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
@@ -16,7 +17,7 @@ const dom = document
 /**
  * Render a single bookmark
  */
-function renderBookmark(subject, context, container) {
+function renderBookmark (subject, context, container) {
   const kb = context.session.store
   const div = dom.createElement('div')
   div.className = 'bookmark-item'
@@ -91,7 +92,7 @@ function renderBookmark(subject, context, container) {
 /**
  * Render the add bookmark form
  */
-function renderAddForm(containerUri, context, onAdd) {
+function renderAddForm (containerUri, context, onAdd) {
   const form = dom.createElement('form')
   form.className = 'bookmark-add-form'
 
@@ -134,7 +135,6 @@ function renderAddForm(containerUri, context, onAdd) {
       // Clear form and refresh
       form.reset()
       if (onAdd) onAdd(subject)
-
     } catch (e) {
       alert('Failed to add bookmark: ' + e.message)
     }
@@ -146,7 +146,7 @@ function renderAddForm(containerUri, context, onAdd) {
 /**
  * Main render function
  */
-export function render(subject, context, options) {
+export function render (subject, context, options) {
   const kb = context.session.store
   const div = dom.createElement('div')
   div.className = 'bookmark-pane'
@@ -300,7 +300,7 @@ export function render(subject, context, options) {
 /**
  * Create a new bookmark resource
  */
-export async function mintNew(context, options) {
+export async function mintNew (context, options) {
   const newBase = options.newBase || context.session.store.any(null, ns.space('preferencesFile'))?.uri
   if (!newBase) {
     throw new Error('No location specified for new bookmark')
