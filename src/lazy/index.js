@@ -49,3 +49,6 @@ export { internalPane } from './internalPane.js'
 
 // Global panes
 export { homePane } from './homePane.js'
+
+// Example panes
+export { bookmarkPane } from './bookmarkPane.js'

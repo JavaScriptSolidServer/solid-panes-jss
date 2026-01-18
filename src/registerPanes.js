@@ -48,7 +48,9 @@ import {
   sharingPane,
   internalPane,
   // Global panes
-  homePane
+  homePane,
+  // Example panes
+  bookmarkPane
 } from './lazy/index.js'
 
 // Core panes that are always loaded (small, essential)
@@ -118,6 +120,9 @@ export function registerPanes (register) {
   register(folderPane)
   register(classInstancePane) // Core - not lazy
   register(slideshowPane)
+
+  // Example panes - must be before dataContentPane
+  register(bookmarkPane)
 
   // Social
   register(socialPane)
