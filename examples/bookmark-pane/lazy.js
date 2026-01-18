@@ -12,11 +12,12 @@
 
 // Import only what's needed for label() checks
 import * as UI from 'solid-ui-jss'
+import * as $rdf from 'rdflib'
 
 const ns = UI.ns
 
 // Define schema namespace for bookmarks
-const schema = UI.rdf.Namespace('http://schema.org/')
+const schema = $rdf.Namespace('http://schema.org/')
 
 export const bookmarkPane = {
   // Unique identifier for this pane
@@ -40,20 +41,21 @@ export const bookmarkPane = {
    */
   label: function (subject, context) {
     const kb = context.session.store
+    const rdfType = ns.rdf('type')
+    const bookmarkType = schema('Bookmark')
 
     // Check if subject is a Bookmark
-    const types = kb.findTypeURIs(subject)
-    if (types[schema('Bookmark').uri]) {
+    if (kb.holds(subject, rdfType, bookmarkType)) {
       return 'Bookmark'
     }
 
     // Check if subject is a container with bookmarks
-    if (types[ns.ldp('Container').uri] || types[ns.ldp('BasicContainer').uri]) {
+    if (kb.holds(subject, rdfType, ns.ldp('Container')) ||
+        kb.holds(subject, rdfType, ns.ldp('BasicContainer'))) {
       const contents = kb.each(subject, ns.ldp('contains'))
-      const hasBookmarks = contents.some(item => {
-        const itemTypes = kb.findTypeURIs(item)
-        return itemTypes[schema('Bookmark').uri]
-      })
+      const hasBookmarks = contents.some(item =>
+        kb.holds(item, rdfType, bookmarkType)
+      )
       if (hasBookmarks) {
         return 'Bookmarks'
       }
@@ -74,12 +76,18 @@ export const bookmarkPane = {
    * @returns {Promise<HTMLElement>} - The rendered pane
    */
   render: async function (subject, context, options) {
-    // Dynamic import - webpack creates a separate chunk
-    const { render } = await import(
-      /* webpackChunkName: "bookmark-pane" */
-      './render.js'
-    )
-    return render(subject, context, options)
+    try {
+      const mod = await import(
+        /* webpackChunkName: "bookmark-pane" */
+        './render.js'
+      )
+      return mod.render(subject, context, options)
+    } catch (e) {
+      console.error('Bookmark pane error:', e)
+      const div = document.createElement('div')
+      div.textContent = 'Error loading bookmark pane: ' + e.message
+      return div
+    }
   },
 
   /**

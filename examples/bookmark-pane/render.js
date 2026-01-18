@@ -6,10 +6,10 @@
  */
 
 import * as UI from 'solid-ui-jss'
-import { store, authn } from 'solid-logic-jss'
+import * as $rdf from 'rdflib'
+import { store } from 'solid-logic-jss'
 
 const ns = UI.ns
-const $rdf = UI.rdf
 const schema = $rdf.Namespace('http://schema.org/')
 const dom = document
 
