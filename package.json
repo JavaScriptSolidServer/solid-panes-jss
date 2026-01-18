@@ -1,6 +1,6 @@
 {
   "name": "solid-panes-jss",
-  "version": "4.0.2",
+  "version": "4.0.3",
   "description": "Solid-compatible Panes (JSS variant with minimal solid-oidc authentication)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
