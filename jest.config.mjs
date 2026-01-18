@@ -8,7 +8,12 @@ export default {
   },
   testPathIgnorePatterns: ['/node_modules/', '/dist/'],
   transform: {
-    '^.+\\.[tj]sx?$': ['babel-jest', { configFile: './babel.config.mjs' }],
+    '^.+\\.[tj]sx?$': ['babel-jest', {
+      presets: [
+        ['@babel/preset-env', { targets: { node: 'current' } }],
+        '@babel/preset-typescript'
+      ]
+    }],
   },
   transformIgnorePatterns: ['/node_modules/(?!(lit-html|solid-logic-jss)).+\\.js'],
   setupFilesAfterEnv: ['./test/helpers/setup.ts'],
