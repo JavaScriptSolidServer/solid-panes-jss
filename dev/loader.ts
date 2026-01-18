@@ -2,7 +2,7 @@ import * as paneRegistry from 'pane-registry'
 import * as $rdf from 'rdflib'
 import { solidLogicSingleton, store, authSession } from 'solid-logic-jss'
 import { getOutliner } from '../src'
-import Pane from 'profile-pane'
+import Pane from 'profile-pane-jss'
 
 // FIXME:
 window.$rdf = $rdf

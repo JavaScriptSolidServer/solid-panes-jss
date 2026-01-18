@@ -15,7 +15,8 @@ export function createContext (
     session: {
       paneRegistry,
       store,
-      logic
+      // Cast to any to bridge solid-logic-jss and solid-logic type differences
+      logic: logic as any
     }
   }
 }

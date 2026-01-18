@@ -3,7 +3,6 @@ import tsParser from '@typescript-eslint/parser'
 import neostandard from 'neostandard'
 
 export default [
-  ...neostandard(),
   {
     ignores: [
       'dist/**',
@@ -13,8 +12,10 @@ export default [
       'dev/**',
       'dev-dist/**',
       'coverage/**',
+      'src/versionInfo.ts',
     ],
   },
+  ...neostandard({ ignores: ['node_modules/**', 'dist/**', 'coverage/**'] }),
   {
     files: ['src/**/*.js', 'src/**/*.cjs', 'src/**/*.mjs'],
     languageOptions: {

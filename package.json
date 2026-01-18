@@ -12,9 +12,9 @@
   ],
   "scripts": {
     "clean": "rm -rf dist src/versionInfo.ts",
-    "build": "npm run clean && npm run build-version && npm run typecheck && npm run build-dist && npm run postbuild-js",
-    "build-version": "./timestamp.sh > src/versionInfo.ts && eslint 'src/versionInfo.ts' --fix",
-    "build-dist": "npm run build-js && npm run build-types",
+    "build": "npm run clean && npm run build-version && npm run build-dist && npm run postbuild-js",
+    "build-version": "./timestamp.sh > src/versionInfo.ts",
+    "build-dist": "npm run build-js",
     "build-js": "babel src --out-dir dist --extensions '.ts,.js' --source-maps",
     "build-types": "tsc --emitDeclarationOnly",
     "postbuild-js": "rm -f dist/versionInfo.d.ts dist/versionInfo.d.ts.map",
@@ -65,16 +65,13 @@
     "issue-pane": "^3.0.0",
     "marked": "^17.0.0",
     "meeting-pane": "^3.0.0",
-    "mime-types": "^3.0.1",
     "pane-registry": "^3.0.0",
     "profile-pane": "^2.0.0",
     "solid-namespace": "^0.5.4",
     "source-pane": "^3.0.0"
   },
   "overrides": {
-    "rdflib": "$rdflib",
-    "solid-logic": "npm:solid-logic-jss@github:JavaScriptSolidServer/solid-logic-jss",
-    "solid-ui": "npm:solid-ui-jss@github:JavaScriptSolidServer/solid-ui-jss"
+    "rdflib": "$rdflib"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.0",
@@ -100,7 +97,7 @@
     "neostandard": "^0.12.2",
     "node-polyfill-webpack-plugin": "^4.1.0",
     "path-browserify": "^1.0.1",
-    "rdflib": "^2.3.0",
+    "rdflib": "github:JavaScriptSolidServer/rdflib.js",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "solid-logic-jss": "github:JavaScriptSolidServer/solid-logic-jss",

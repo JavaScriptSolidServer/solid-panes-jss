@@ -7,7 +7,7 @@
 
 import * as UI from 'solid-ui-jss'
 import * as $rdf from 'rdflib'
-import * as mime from 'mime-types'
+import * as mime from '../utils/mimeTypes'
 
 // const DOKIELI_TEMPLATE_URI = 'https://dokie.li/new' // Copy to make new dok
 
