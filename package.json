@@ -57,7 +57,6 @@
   "homepage": "https://github.com/JavaScriptSolidServer/solid-panes-jss",
   "dependencies": {
     "@solid/better-simple-slideshow": "^0.1.0",
-    "activitystreams-pane": "^1.0.0",
     "chat-pane": "^3.0.0",
     "contacts-pane": "^3.0.0",
     "dompurify": "^3.2.6",

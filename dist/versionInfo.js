@@ -5,8 +5,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 var _default = exports.default = {
-  buildTime: "2026-01-18T07:15:38Z",
-  commit: "a13ce24c9340c275fb968c1533c3869133d23d6a",
+  buildTime: "2026-01-18T07:24:53Z",
+  commit: "720585c2743e650173577d51b0d854e731e1b193",
   npmInfo: {
     "'solid-panes-jss'": "'4.0.2',",
     "npm": "'11.5.1',",
