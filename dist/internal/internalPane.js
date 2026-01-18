@@ -1,11 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidUiJss = require("solid-ui-jss");
-var _rdflib = require("rdflib");
 /*   Internal Pane
  **
  **  This outline pane contains the properties which are
@@ -13,8 +5,10 @@ var _rdflib = require("rdflib");
  */
 /* global alert confirm */
 
+import { icons, ns, widgets } from 'solid-ui-jss';
+import { literal, st, sym } from 'rdflib';
 const pane = {
-  icon: _solidUiJss.icons.originalIconBase + 'tango/22-emblem-system.png',
+  icon: icons.originalIconBase + 'tango/22-emblem-system.png',
   name: 'internal',
   label: function () {
     return 'under the hood'; // There is often a URI even of no statements
@@ -40,8 +34,8 @@ const pane = {
       }
       return new Promise(function (resolve, reject) {
         fetcher.load(folder).then(function () {
-          const promises = kb.each(folder, _solidUiJss.ns.ldp('contains')).map(file => {
-            if (kb.holds(file, _solidUiJss.ns.rdf('type'), _solidUiJss.ns.ldp('BasicContainer'))) {
+          const promises = kb.each(folder, ns.ldp('contains')).map(file => {
+            if (kb.holds(file, ns.rdf('type'), ns.ldp('BasicContainer'))) {
               return deleteRecursive(kb, file);
             } else {
               console.log('deleteRecursive leaf file: ' + file);
@@ -73,11 +67,11 @@ const pane = {
       controls.style.margin = '1em';
       const controlRow = controls.appendChild(dom.createElement('tr'));
       const deleteCell = controlRow.appendChild(dom.createElement('td'));
-      const isFolder = subject.uri && subject.uri.endsWith('/') || store.holds(subject, _solidUiJss.ns.rdf('type'), _solidUiJss.ns.ldp('Container'));
+      const isFolder = subject.uri && subject.uri.endsWith('/') || store.holds(subject, ns.rdf('type'), ns.ldp('Container'));
       const noun = isFolder ? 'folder' : 'file';
       if (!isProtectedUri(subject)) {
         console.log(subject);
-        const deleteButton = _solidUiJss.widgets.deleteButtonWithCheck(dom, deleteCell, noun, function () {
+        const deleteButton = widgets.deleteButtonWithCheck(dom, deleteCell, noun, function () {
           if (!confirm(`Are you sure you want to delete ${subject}? This cannot be undone.`)) {
             return;
           }
@@ -100,7 +94,7 @@ const pane = {
         deleteCell.appendChild(deleteButton);
       }
       const refreshCell = controlRow.appendChild(dom.createElement('td'));
-      const refreshButton = _solidUiJss.widgets.button(dom, _solidUiJss.icons.iconBase + 'noun_479395.svg', 'refresh');
+      const refreshButton = widgets.button(dom, icons.iconBase + 'noun_479395.svg', 'refresh');
       refreshCell.appendChild(refreshButton);
       refreshButton.addEventListener('click', () => {
         if (!store.fetcher) {
@@ -124,15 +118,15 @@ const pane = {
       throw new Error('Store has no fetcher');
     }
     if (subject.uri) {
-      plist.push((0, _rdflib.st)(subject, (0, _rdflib.sym)('http://www.w3.org/2007/ont/link#uri'), subject.uri,
+      plist.push(st(subject, sym('http://www.w3.org/2007/ont/link#uri'), subject.uri,
       // @@ TODO Remove casting
       store.fetcher.appNode));
       if (subject.uri.indexOf('#') >= 0) {
         docURI = subject.uri.split('#')[0];
-        plist.push((0, _rdflib.st)(subject, (0, _rdflib.sym)('http://www.w3.org/2007/ont/link#documentURI'), subject.uri.split('#')[0],
+        plist.push(st(subject, sym('http://www.w3.org/2007/ont/link#documentURI'), subject.uri.split('#')[0],
         // @@ TODO Remove casting
         store.fetcher.appNode));
-        plist.push((0, _rdflib.st)(subject, (0, _rdflib.sym)('http://www.w3.org/2007/ont/link#document'), (0, _rdflib.sym)(subject.uri.split('#')[0]), store.fetcher.appNode));
+        plist.push(st(subject, sym('http://www.w3.org/2007/ont/link#document'), sym(subject.uri.split('#')[0]), store.fetcher.appNode));
       } else {
         docURI = subject.uri;
       }
@@ -143,7 +137,7 @@ const pane = {
       }
       const ed = store.updater.editable(docURI);
       if (ed) {
-        plist.push((0, _rdflib.st)(subject, (0, _rdflib.sym)('http://www.w3.org/ns/rww#editable'), (0, _rdflib.literal)(ed.toString()), store.fetcher.appNode));
+        plist.push(st(subject, sym('http://www.w3.org/ns/rww#editable'), literal(ed.toString()), store.fetcher.appNode));
       }
     }
     // @@ TODO get a proper type
@@ -180,5 +174,7 @@ function isProtectedUri(subject) {
   const siteUri = subject.site().uri;
   return subject.uri === siteUri || subject.uri === siteUri + 'profile/' || subject.uri === siteUri + 'profile/card' || subject.uri === siteUri + 'settings/' || subject.uri === siteUri + 'settings/prefs.ttl' || subject.uri === siteUri + 'settings/privateTypeIndex.ttl' || subject.uri === siteUri + 'settings/publicTypeIndex.ttl' || subject.uri === siteUri + 'settings/serverSide.ttl';
 }
-var _default = exports.default = pane; // ends
+export default pane;
+
+// ends
 //# sourceMappingURL=internalPane.js.map

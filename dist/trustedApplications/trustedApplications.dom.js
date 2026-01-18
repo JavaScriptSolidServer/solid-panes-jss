@@ -1,16 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createApplicationTable = createApplicationTable;
-exports.createContainer = createContainer;
-exports.createText = createText;
-var _rdflib = require("rdflib");
-var _solidUiJss = require("solid-ui-jss");
-var _solidLogicJss = require("solid-logic-jss");
-var _trustedApplications = require("./trustedApplications.utils");
-function createApplicationTable(subject) {
+import { sym } from 'rdflib';
+import { ns } from 'solid-ui-jss';
+import { store } from 'solid-logic-jss';
+import { generateRandomString, getStatementsToAdd, getStatementsToDelete } from './trustedApplications.utils';
+export function createApplicationTable(subject) {
   const applicationsTable = createElement('table', {
     class: 'results'
   });
@@ -20,8 +12,8 @@ function createApplicationTable(subject) {
   applicationsTable.appendChild(header);
 
   // creating rows
-  _solidLogicJss.store.each(subject, _solidUiJss.ns.acl('trustedApp'), undefined, undefined).flatMap(app => _solidLogicJss.store.each(app, _solidUiJss.ns.acl('origin'), undefined, undefined).map(origin => ({
-    appModes: _solidLogicJss.store.each(app, _solidUiJss.ns.acl('mode'), undefined, undefined),
+  store.each(subject, ns.acl('trustedApp'), undefined, undefined).flatMap(app => store.each(app, ns.acl('origin'), undefined, undefined).map(origin => ({
+    appModes: store.each(app, ns.acl('mode'), undefined, undefined),
     origin: origin
   }))).sort((a, b) => a.origin.value < b.origin.value ? -1 : 1).forEach(({
     appModes,
@@ -29,7 +21,7 @@ function createApplicationTable(subject) {
   }) => applicationsTable.appendChild(createApplicationEntry(subject, origin, appModes, updateTable)));
 
   // adding a row for new applications
-  applicationsTable.appendChild(createApplicationEntry(subject, null, [_solidUiJss.ns.acl('Read')], updateTable));
+  applicationsTable.appendChild(createApplicationEntry(subject, null, [ns.acl('Read')], updateTable));
   return applicationsTable;
   function updateTable() {
     applicationsTable.parentElement.replaceChild(createApplicationTable(subject), applicationsTable);
@@ -72,31 +64,31 @@ function createApplicationEntry(subject, origin, appModes, updateTable) {
     event.preventDefault();
     let origin;
     try {
-      origin = (0, _rdflib.sym)(trustedApplicationState.formElements.origin.value);
+      origin = sym(trustedApplicationState.formElements.origin.value);
     } catch (err) {
       return alert('Please provide an application URL you want to trust');
     }
     const modes = trustedApplicationState.formElements.modes.filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
-    const deletions = (0, _trustedApplications.getStatementsToDelete)(trustedApplicationState.origin || origin, subject, _solidLogicJss.store, _solidUiJss.ns);
-    const additions = (0, _trustedApplications.getStatementsToAdd)(origin, (0, _trustedApplications.generateRandomString)(), modes, subject, _solidUiJss.ns);
-    if (!_solidLogicJss.store.updater) {
+    const deletions = getStatementsToDelete(trustedApplicationState.origin || origin, subject, store, ns);
+    const additions = getStatementsToAdd(origin, generateRandomString(), modes, subject, ns);
+    if (!store.updater) {
       throw new Error('Store has no updater');
     }
-    _solidLogicJss.store.updater.update(deletions, additions, handleUpdateResponse);
+    store.updater.update(deletions, additions, handleUpdateResponse);
   }
   function removeApplication(event) {
     event.preventDefault();
     let origin;
     try {
-      origin = (0, _rdflib.sym)(trustedApplicationState.formElements.origin.value);
+      origin = sym(trustedApplicationState.formElements.origin.value);
     } catch (err) {
       return alert('Please provide an application URL you want to remove trust from');
     }
-    const deletions = (0, _trustedApplications.getStatementsToDelete)(origin, subject, _solidLogicJss.store, _solidUiJss.ns);
-    if (!_solidLogicJss.store.updater) {
+    const deletions = getStatementsToDelete(origin, subject, store, ns);
+    if (!store.updater) {
       throw new Error('Store has no updater');
     }
-    _solidLogicJss.store.updater.update(deletions, [], handleUpdateResponse);
+    store.updater.update(deletions, [], handleUpdateResponse);
   }
   function handleUpdateResponse(uri, success, errorBody) {
     if (success) {
@@ -118,12 +110,12 @@ function createElement(elementName, attributes = {}, eventListeners = {}, onCrea
   });
   return element;
 }
-function createContainer(elementName, children, attributes = {}, eventListeners = {}, onCreated = null) {
+export function createContainer(elementName, children, attributes = {}, eventListeners = {}, onCreated = null) {
   const element = createElement(elementName, attributes, eventListeners, onCreated);
   children.forEach(child => element.appendChild(child));
   return element;
 }
-function createText(elementName, textContent, attributes = {}, eventListeners = {}, onCreated = null) {
+export function createText(elementName, textContent, attributes = {}, eventListeners = {}, onCreated = null) {
   const element = createElement(elementName, attributes, eventListeners, onCreated);
   element.textContent = textContent;
   return element;
@@ -133,13 +125,13 @@ function createModesInput({
   formElements
 }) {
   return ['Read', 'Write', 'Append', 'Control'].map(mode => {
-    const isChecked = appModes.some(appMode => appMode.value === _solidUiJss.ns.acl(mode).value);
+    const isChecked = appModes.some(appMode => appMode.value === ns.acl(mode).value);
     return createContainer('label', [createElement('input', {
       type: 'checkbox',
       ...(isChecked ? {
         checked: ''
       } : {}),
-      value: _solidUiJss.ns.acl(mode).uri
+      value: ns.acl(mode).uri
     }, {}, element => formElements.modes.push(element)), createText('span', mode)]);
   });
 }

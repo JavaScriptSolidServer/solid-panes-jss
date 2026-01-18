@@ -1,146 +1,141 @@
-"use strict";
+/**
+ * Register all panes with the pane registry
+ *
+ * Panes are lazy-loaded - only the lightweight label() functions run upfront.
+ * The actual pane code is loaded on-demand when render() is called.
+ */
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.registerPanes = registerPanes;
-var _profilePane = _interopRequireDefault(require("profile-pane"));
-var _trustedApplications = _interopRequireDefault(require("./trustedApplications/trustedApplications.view"));
-var _dashboardPane = _interopRequireDefault(require("./dashboard/dashboardPane"));
-var _basicPreferences = _interopRequireDefault(require("./dashboard/basicPreferences"));
-var _issuePane = _interopRequireDefault(require("issue-pane"));
-var _contactsPane = _interopRequireDefault(require("contacts-pane"));
-var _activitystreamsPane = _interopRequireDefault(require("./activitystreams/activitystreamsPane.js"));
-var _padPane = _interopRequireDefault(require("./pad/padPane"));
-var _pane = _interopRequireDefault(require("./transaction/pane.js"));
-var _period = _interopRequireDefault(require("./transaction/period.js"));
-var _meetingPane = _interopRequireDefault(require("meeting-pane"));
-var _tabbedPane = _interopRequireDefault(require("./tabbed/tabbedPane"));
-var _chatPane = require("chat-pane");
-var _schedulePane = require("./schedule/schedulePane.js");
-var _tripPane = _interopRequireDefault(require("./trip/tripPane.js"));
-var _imagePane = require("./imagePane.js");
-var _playlistPane = _interopRequireDefault(require("./playlist/playlistPane.js"));
-var _videoPane = _interopRequireDefault(require("./video/videoPane.js"));
-var _audioPane = _interopRequireDefault(require("./audio/audioPane.js"));
-var _dokieliPane = _interopRequireDefault(require("./dokieli/dokieliPane.js"));
-var _folderPane = _interopRequireDefault(require("folder-pane"));
-var _classInstancePane = require("./classInstancePane.js");
-var _slideshowPane = require("./slideshow/slideshowPane.js");
-var _socialPane = require("./socialPane.js");
-var _humanReadablePane = _interopRequireDefault(require("./humanReadablePane.js"));
-var _dataContentPane = require("./dataContentPane.js");
-var _sourcePane = _interopRequireDefault(require("source-pane"));
-var _n3Pane = require("./n3Pane.js");
-var _RDFXMLPane = require("./RDFXMLPane.js");
-var _pane2 = require("./form/pane.js");
-var _tableViewPane = require("./tableViewPane.js");
-var _defaultPane = require("./defaultPane.js");
-var _pane3 = _interopRequireDefault(require("./ui/pane.js"));
-var _sharingPane = _interopRequireDefault(require("./sharing/sharingPane"));
-var _internalPane = _interopRequireDefault(require("./internal/internalPane"));
-var _homePane = _interopRequireDefault(require("./home/homePane"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-// import editProfileView from './profile/editProfile.view'
+// Lazy-loaded pane wrappers
+import {
+// Chat
+longChatPane, shortChatPane,
+// Profile & contacts
+profilePane, editProfilePane, contactsPane,
+// Issues & meetings
+issuePane, meetingPane,
+// Content panes
+folderPane, padPane, sourcePane,
+// Media panes
+imagePane, videoPane, audioPane, playlistPane,
+// Financial panes
+transactionPane, financialPeriodPane, tripPane,
+// Scheduling
+schedulePane,
+// Content views
+slideshowPane, dokieliPane, socialPane,
+// Dashboard & preferences
+dashboardPane, basicPreferencesPane, trustedApplicationsPane,
+// Activity & forms
+activityStreamsPane, formPane, tabbedPane,
+// Sharing & internals
+sharingPane, internalPane,
+// Global panes
+homePane } from './lazy/index.js';
 
-// import argumentPane from './argument/argumentPane.js'
-
-// import publicationPane from './publication/publicationPane.js'
-
-function registerPanes(register) {
+// Core panes that are always loaded (small, essential)
+import { classInstancePane } from './classInstancePane.js';
+import { dataContentPane } from './dataContentPane.js';
+import { n3Pane } from './n3Pane.js';
+import { RDFXMLPane } from './RDFXMLPane.js';
+import { tableViewPane } from './tableViewPane.js';
+import { defaultPane } from './defaultPane.js';
+import humanReadablePane from './humanReadablePane.js';
+import uiPane from './ui/pane.js';
+export function registerPanes(register) {
   /*  Note that the earliest panes have priority. So the most specific ones are first.
    **
    */
-  // Developer designed:
 
-  register(_profilePane.default); // View someone's public profile - dominates all other panes.
-  const editProfileView = _profilePane.default.editor;
-  if (!editProfileView) {
-    console.log('@@@ editProfileView', 'profilePane is not providing an editor pane');
-  }
-  register(editProfileView); // Edit my profile.
+  // === LAZY-LOADED PANES ===
 
-  register(_trustedApplications.default); // must be registered before basicPreferences
-  register(_dashboardPane.default);
-  register(_basicPreferences.default);
-  register(_issuePane.default);
-  register(_contactsPane.default);
-  register(_activitystreamsPane.default);
-  register(_padPane.default);
-  // register(argumentPane) // A position in an argument tree
+  // Profile panes - high priority for person URIs
+  register(profilePane);
+  register(editProfilePane);
 
-  register(_pane.default);
-  register(_period.default);
-  register(_meetingPane.default);
-  register(_tabbedPane.default);
-  register(_chatPane.longChatPane); // Long pane must have prio in case short pane tries to do a long pane
-  register(_chatPane.shortChatPane); // was './chat/chatPane.js'
+  // Preferences - must be before basicPreferences
+  register(trustedApplicationsPane);
+  register(dashboardPane);
+  register(basicPreferencesPane);
 
-  // register(publicationPane)  // Suppress for now
+  // Issue tracking
+  register(issuePane);
 
-  register(_schedulePane.schedulePane); // doodle poll
+  // Contacts
+  register(contactsPane);
 
-  register(_tripPane.default);
-  // register(require('./airPane.js'))
+  // Activity streams
+  register(activityStreamsPane);
 
-  // Content views
+  // Notepad
+  register(padPane);
 
-  register(_imagePane.imagePane); // Basic image view
-  register(_playlistPane.default); // Basic playlist view
+  // Financial
+  register(transactionPane);
+  register(financialPeriodPane);
 
-  register(_videoPane.default); // Video clip player
-  register(_audioPane.default); // Audio clip player
+  // Meetings
+  register(meetingPane);
+  register(tabbedPane);
 
-  register(_dokieliPane.default); // Should be above dataContentPane
-  register(_folderPane.default); // Should be above dataContentPane
-  register(_classInstancePane.classInstancePane); // Should be above dataContentPane
-  // register(require('./dynamic/dynamicPanes.js')) // warp etc  warp broken 2017/8
-  register(_slideshowPane.slideshowPane);
-  register(_socialPane.socialPane);
-  register(_humanReadablePane.default); // A web page as a web page -- how to escape to tabr?
-  // register(require('markdown-pane').Pane) // replaced by markdown in humanReadablePane
+  // Chat - lazy-loaded
+  register(longChatPane);
+  register(shortChatPane);
 
-  register(_dataContentPane.dataContentPane); // Preferred for a data file
-  register(_sourcePane.default); // edit source
-  register(_n3Pane.n3Pane);
-  register(_RDFXMLPane.RDFXMLPane);
+  // Scheduling
+  register(schedulePane);
 
-  // User configured - data driven
-  register(_pane2.formPane);
+  // Trip expenses
+  register(tripPane);
 
-  // Generic:
+  // Media panes
+  register(imagePane);
+  register(playlistPane);
+  register(videoPane);
+  register(audioPane);
 
-  register(_tableViewPane.tableViewPane);
+  // Document panes
+  register(dokieliPane);
+  register(folderPane);
+  register(classInstancePane); // Core - not lazy
+  register(slideshowPane);
 
-  // Fallback totally generic:
-  register(_defaultPane.defaultPane);
-  register(_pane3.default);
+  // Social
+  register(socialPane);
 
-  // register(require("categoryPane.js"))  // Not useful enough
-  // register(require("pubsPane.js")) // not finished
+  // Human readable (web pages)
+  register(humanReadablePane); // Core - not lazy
 
-  // @@ jambo commented these things out to pare things down temporarily.
-  // Note must use // not /* to comment out to make sure expander sees it
-  // register(require("lawPane.js"))
+  // === CORE PANES (always loaded) ===
 
-  // register(require('./microblogPane/microblogPane.js'))
+  // Data content pane - essential for RDF browsing
+  register(dataContentPane);
 
-  // register(require("./social/pane.js")) // competitor to other social
-  // register(require("./airPane.js"))
-  // register(require("./lawPane.js"))
-  // register(require("pushbackPane.js"))
-  // register(require("CVPane.js"))
-  // register(require("photoPane.js"))
-  // register(require("tagPane.js"))
-  // register(require("photoImportPane.js"))
+  // Source viewing - lazy
+  register(sourcePane);
 
-  // The sharing pane is fairly generic and administrative  201
-  register(_sharingPane.default);
+  // RDF format panes - core
+  register(n3Pane);
+  register(RDFXMLPane);
 
-  // The internals pane is always (almost?) the last as it is the least user-friendly
-  register(_internalPane.default);
-  register(_homePane.default); // This is a global pane
+  // Forms - lazy
+  register(formPane);
 
-  // ENDS
+  // Table view - core
+  register(tableViewPane);
+
+  // Default fallback - core, always needed
+  register(defaultPane);
+
+  // UI pane - core
+  register(uiPane);
+
+  // Sharing - lazy
+  register(sharingPane);
+
+  // Internal/developer - lazy
+  register(internalPane);
+
+  // Home - global, lazy
+  register(homePane);
 }
 //# sourceMappingURL=registerPanes.js.map

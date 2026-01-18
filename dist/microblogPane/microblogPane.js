@@ -1,23 +1,16 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidLogicJss = require("solid-logic-jss");
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var $rdf = _interopRequireWildcard(require("rdflib"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /*
  Microblog pane
  Charles McKenzie <charles2@mit.edu>
 */
 /* global alert */
-var _default = exports.default = {
+import { authn, store } from 'solid-logic-jss';
+import * as UI from 'solid-ui-jss';
+import * as $rdf from 'rdflib';
+export default {
   icon: UI.icons.originalIconBase + 'microblog/microblog.png',
   name: 'microblogPane',
   label: function (subject) {
-    if (_solidLogicJss.store.whether(subject, UI.ns.rdf('type'), UI.ns.foaf('Person'))) {
+    if (store.whether(subject, UI.ns.rdf('type'), UI.ns.foaf('Person'))) {
       return 'Microblog';
     } else {
       return null;
@@ -32,9 +25,9 @@ var _default = exports.default = {
     const FOAF = $rdf.Namespace('http://xmlns.com/foaf/0.1/');
     const terms = $rdf.Namespace('http://purl.org/dc/terms/');
     const RDF = UI.ns.rdf;
-    const kb = _solidLogicJss.store;
+    const kb = store;
     const charCount = 140;
-    const sf = _solidLogicJss.store.fetcher;
+    const sf = store.fetcher;
     //* **********************************************
     // BACK END
     //* **********************************************
@@ -131,7 +124,7 @@ var _default = exports.default = {
       // attempt to fetch user account from local preferences if just
       // in case the user's foaf was not writable. add it to the store
       // this will probably need to change.
-      const theUser = _solidLogicJss.authn.currentUser();
+      const theUser = authn.currentUser();
       if (theUser) {
         let theAccount = UI.preferences.get('acct');
         if (theAccount) {
@@ -214,7 +207,7 @@ var _default = exports.default = {
       });
     };
     Microblog.prototype.getMyURI = function () {
-      const me = _solidLogicJss.authn.currentUser();
+      const me = authn.currentUser();
       console.log(me);
       const myMicroblog = kb.any(kb.sym(me), FOAF('holdsAccount'));
       console.log('\n\n' + myMicroblog);
@@ -320,7 +313,7 @@ var _default = exports.default = {
       } else if (resourceType.uri === SIOC('User').uri) {
         this.thisIsMe = s.uri === mb.getMyURI();
       } else if (resourceType.uri === FOAF('Person').uri) {
-        const me = _solidLogicJss.authn.currentUser();
+        const me = authn.currentUser();
         const meUri = me && me.uri;
         this.thisIsMe = s.uri === meUri;
       } else {

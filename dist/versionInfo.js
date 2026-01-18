@@ -1,14 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _default = exports.default = {
-  buildTime: "2026-01-18T07:24:53Z",
-  commit: "720585c2743e650173577d51b0d854e731e1b193",
+export default {
+  buildTime: "2026-01-18T12:33:19Z",
+  commit: "8bb405a025b79dcc1e11f1fbaa016a26760f9e10",
   npmInfo: {
-    "'solid-panes-jss'": "'4.0.2',",
+    "'solid-panes-jss'": "'4.0.3',",
     "npm": "'11.5.1',",
     "node": "'24.5.0',",
     "acorn": "'8.15.0',",

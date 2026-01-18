@@ -641,32 +641,54 @@ export default function (context) {
                   }
                 }
                 const renderPane = function (pane) {
-                  let paneDiv
                   UI.log.info('outline: Rendering pane (2): ' + pane.name)
 
-                  try {
-                    paneDiv = pane.render(subject, context, options)
-                  } catch (e) {
-                    // Easier debugging for pane developers
-                    paneDiv = dom.createElement('div')
-                    paneDiv.setAttribute('class', 'exceptionPane')
-                    const pre = dom.createElement('pre')
-                    paneDiv.appendChild(pre)
-                    pre.appendChild(
-                      dom.createTextNode(UI.utils.stackString(e))
-                    )
-                  }
-
-                  if (
-                    pane.requireQueryButton &&
-                    dom.getElementById('queryButton')
-                  ) {
-                    dom.getElementById('queryButton').removeAttribute('style')
-                  }
                   const second = containingTable.firstChild.nextSibling
                   const row = dom.createElement('tr')
                   const cell = row.appendChild(dom.createElement('td'))
-                  cell.appendChild(paneDiv)
+
+                  // Helper to handle the rendered result
+                  const handleRendered = (paneDiv) => {
+                    cell.appendChild(paneDiv)
+                    if (
+                      pane.requireQueryButton &&
+                      dom.getElementById('queryButton')
+                    ) {
+                      dom.getElementById('queryButton').removeAttribute('style')
+                    }
+                  }
+
+                  // Helper for errors
+                  const handleError = (e) => {
+                    const errorDiv = dom.createElement('div')
+                    errorDiv.setAttribute('class', 'exceptionPane')
+                    const pre = dom.createElement('pre')
+                    errorDiv.appendChild(pre)
+                    pre.appendChild(dom.createTextNode(UI.utils.stackString(e)))
+                    return errorDiv
+                  }
+
+                  try {
+                    const result = pane.render(subject, context, options)
+                    // Handle async render (returns Promise)
+                    if (result && typeof result.then === 'function') {
+                      const loading = dom.createElement('div')
+                      loading.textContent = 'Loading ' + pane.name + '...'
+                      cell.appendChild(loading)
+                      result.then(paneDiv => {
+                        cell.removeChild(loading)
+                        handleRendered(paneDiv)
+                      }).catch(e => {
+                        cell.removeChild(loading)
+                        handleRendered(handleError(e))
+                      })
+                    } else {
+                      handleRendered(result)
+                    }
+                  } catch (e) {
+                    handleRendered(handleError(e))
+                  }
+
                   if (second) containingTable.insertBefore(row, second)
                   else containingTable.appendChild(row)
                   row.pane = pane
@@ -820,30 +842,56 @@ export default function (context) {
         table.appendChild(tr1)
 
         if (tr1.firstPane) {
-          let paneDiv
-          try {
-            UI.log.info('outline: Rendering pane (1): ' + tr1.firstPane.name)
-            paneDiv = tr1.firstPane.render(subject, context, options)
-          } catch (e) {
-            // Easier debugging for pane developers
-            paneDiv = dom.createElement('div')
-            paneDiv.setAttribute('class', 'exceptionPane')
-            const pre = dom.createElement('pre')
-            paneDiv.appendChild(pre)
-            pre.appendChild(dom.createTextNode(UI.utils.stackString(e)))
-          }
+          const pane = tr1.firstPane
+          UI.log.info('outline: Rendering pane (1): ' + pane.name)
 
           const row = dom.createElement('tr')
           const cell = row.appendChild(dom.createElement('td'))
-          cell.appendChild(paneDiv)
-          if (
-            tr1.firstPane.requireQueryButton &&
-            dom.getElementById('queryButton')
-          ) {
-            dom.getElementById('queryButton').removeAttribute('style')
+
+          // Helper to handle the rendered result
+          const handleRendered = (paneDiv) => {
+            cell.appendChild(paneDiv)
+            if (
+              pane.requireQueryButton &&
+              dom.getElementById('queryButton')
+            ) {
+              dom.getElementById('queryButton').removeAttribute('style')
+            }
           }
+
+          // Helper for errors
+          const handleError = (e) => {
+            const errorDiv = dom.createElement('div')
+            errorDiv.setAttribute('class', 'exceptionPane')
+            const pre = dom.createElement('pre')
+            errorDiv.appendChild(pre)
+            pre.appendChild(dom.createTextNode(UI.utils.stackString(e)))
+            return errorDiv
+          }
+
+          try {
+            const result = pane.render(subject, context, options)
+            // Handle async render (returns Promise)
+            if (result && typeof result.then === 'function') {
+              const loading = dom.createElement('div')
+              loading.textContent = 'Loading ' + pane.name + '...'
+              cell.appendChild(loading)
+              result.then(paneDiv => {
+                cell.removeChild(loading)
+                handleRendered(paneDiv)
+              }).catch(e => {
+                cell.removeChild(loading)
+                handleRendered(handleError(e))
+              })
+            } else {
+              handleRendered(result)
+            }
+          } catch (e) {
+            handleRendered(handleError(e))
+          }
+
           table.appendChild(row)
-          row.pane = tr1.firstPane
+          row.pane = pane
           row.paneButton = tr1.paneButton
         }
       })

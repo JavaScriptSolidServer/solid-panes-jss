@@ -1,13 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidLogicJss = require("solid-logic-jss");
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var panes = _interopRequireWildcard(require("pane-registry"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /*      View argument Pane
 **
 **  This pane shows a position and optionally the positions which
@@ -16,14 +6,18 @@ function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r
 ** Should allow editing the data too
 
 */
+import { store } from 'solid-logic-jss';
+import * as UI from 'solid-ui-jss';
+import * as panes from 'pane-registry';
+
 // console.log('@@@ argument pane icon at ' + (module.__dirname || __dirname) + '/icon_argument.png')
-var _default = exports.default = {
+export default {
   icon: (module.__dirname || __dirname) + '/icon_argument.png',
   // @@ fix fro mashlib version
 
   name: 'argument',
   label: function (subject) {
-    const kb = _solidLogicJss.store;
+    const kb = store;
     const t = kb.findTypeURIs(subject);
     if (t[UI.ns.arg('Position').uri]) return 'Argument';
     return null;
@@ -31,7 +25,7 @@ var _default = exports.default = {
   // View the data in a file in user-friendly way
   render: function (subject, dom) {
     const outliner = panes.getOutliner(dom);
-    const kb = _solidLogicJss.store;
+    const kb = store;
     const arg = UI.ns.arg;
     subject = kb.canon(subject);
     // var types = kb.findTypeURIs(subject)
@@ -57,5 +51,7 @@ var _default = exports.default = {
     div.appendChild(dom.createElement('hr'));
     return div;
   }
-}; // ends
+};
+
+// ends
 //# sourceMappingURL=argumentPane.js.map

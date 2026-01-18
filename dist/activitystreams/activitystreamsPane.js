@@ -1,12 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var _rdflib = require("rdflib");
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /**
  * ActivityStreams Pane - Vanilla JS rewrite
  *
@@ -14,6 +5,8 @@ function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r
  * Replaces the React-based activitystreams-pane package (~11MB -> ~3KB)
  */
 
+import * as UI from 'solid-ui-jss';
+import { sym } from 'rdflib';
 const ns = UI.ns;
 
 // Styles for the note card
@@ -118,7 +111,7 @@ function isPerson(store, node) {
 function readImageSrc(store, node) {
   const image = store.anyValue(node, ns.as('image'));
   if (image) {
-    return store.anyValue((0, _rdflib.sym)(image), ns.as('url')) || null;
+    return store.anyValue(sym(image), ns.as('url')) || null;
   }
   return store.anyValue(node, ns.foaf('img')) || store.anyValue(node, ns.vcard('hasPhoto')) || null;
 }
@@ -231,7 +224,7 @@ function createNoteCard(doc, note) {
 /**
  * The ActivityStreams Pane
  */
-var _default = exports.default = {
+export default {
   icon: UI.icons.iconBase + 'noun_15695.svg',
   name: 'activitystreams',
   label: function (subject, context) {
@@ -259,7 +252,7 @@ var _default = exports.default = {
 
     // If attribution is just a link, try to fetch and update
     if (note.attribution.type === 'link') {
-      const attributionNode = (0, _rdflib.sym)(note.attribution.uri);
+      const attributionNode = sym(note.attribution.uri);
       store.fetcher.load(attributionNode).then(() => {
         // Re-read attribution after fetch
         const updatedAttribution = readAttribution(store, subject);

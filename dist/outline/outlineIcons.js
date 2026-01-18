@@ -1,14 +1,7 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.outlineIcons = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 // This is a system of tracking tooltip phrases used by the tabulator outliner
 
-const outlineIcons = exports.outlineIcons = {};
+import * as UI from 'solid-ui-jss';
+export const outlineIcons = {};
 outlineIcons.src = []; // collect the URIs of the icon filterColumns
 outlineIcons.tooltips = []; // look up tool tips from URL
 

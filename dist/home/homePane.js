@@ -1,11 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidLogicJss = require("solid-logic-jss");
-var _solidUiJss = require("solid-ui-jss");
 /*   Home Pane
  **
  ** The home pane is avaiable everywhere and allows a user
@@ -16,8 +8,10 @@ var _solidUiJss = require("solid-ui-jss");
  **
  */
 
+import { authn } from 'solid-logic-jss';
+import { create, icons, login } from 'solid-ui-jss';
 const HomePaneSource = {
-  icon: _solidUiJss.icons.iconBase + 'noun_547570.svg',
+  icon: icons.iconBase + 'noun_547570.svg',
   // noun_25830
 
   global: true,
@@ -55,13 +49,13 @@ const HomePaneSource = {
         statusArea: div,
         me
       };
-      const relevantPanes = await _solidUiJss.login.filterAvailablePanes(context.session.paneRegistry.list);
-      _solidUiJss.create.newThingUI(creationContext, context, relevantPanes); // newUI Have to pass panes down
+      const relevantPanes = await login.filterAvailablePanes(context.session.paneRegistry.list);
+      create.newThingUI(creationContext, context, relevantPanes); // newUI Have to pass panes down
 
-      _solidUiJss.login.registrationList(homePaneContext, {}).then(function () {});
+      login.registrationList(homePaneContext, {}).then(function () {});
     };
     const div = dom.createElement('div');
-    const me = _solidLogicJss.authn.currentUser(); // this will be incorrect if not logged in
+    const me = authn.currentUser(); // this will be incorrect if not logged in
 
     showContent();
     return div;
@@ -69,5 +63,5 @@ const HomePaneSource = {
 }; // pane object
 
 // ends
-var _default = exports.default = HomePaneSource;
+export default HomePaneSource;
 //# sourceMappingURL=homePane.js.map

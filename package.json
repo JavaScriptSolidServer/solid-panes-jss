@@ -57,14 +57,14 @@
   "homepage": "https://github.com/JavaScriptSolidServer/solid-panes-jss",
   "dependencies": {
     "@solid/better-simple-slideshow": "^0.1.0",
-    "chat-pane": "^3.0.0",
+    "chat-pane-jss": "file:../chat-pane-jss",
     "contacts-pane": "^3.0.0",
     "dompurify": "^3.2.6",
     "folder-pane": "^3.0.0",
     "issue-pane": "^3.0.0",
     "marked": "^17.0.0",
     "meeting-pane": "^3.0.0",
-    "pane-registry": "^3.0.0",
+    "pane-registry-jss": "file:../pane-registry-jss",
     "profile-pane": "^2.0.0",
     "solid-namespace": "^0.5.4",
     "source-pane": "^3.0.0"

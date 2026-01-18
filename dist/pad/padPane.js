@@ -1,21 +1,15 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidUiJss = require("solid-ui-jss");
-var _solidLogicJss = require("solid-logic-jss");
-var _rdflib = require("rdflib");
+import { icons, ns, pad, widgets, login } from 'solid-ui-jss';
+import { authn } from 'solid-logic-jss';
+import { graph, log, NamedNode, Namespace, sym, serialize } from 'rdflib';
 /*   pad Pane
  **
  */
 
 const paneDef = {
   // icon:  (module.__dirname || __dirname) + 'images/ColourOn.png',
-  icon: _solidUiJss.icons.iconBase + 'noun_79217.svg',
+  icon: icons.iconBase + 'noun_79217.svg',
   name: 'pad',
-  audience: [_solidUiJss.ns.solid('PowerUser')],
+  audience: [ns.solid('PowerUser')],
   // Does the subject deserve an pad pane?
   label: function (subject, context) {
     const t = context.session.store.findTypeURIs(subject);
@@ -24,7 +18,7 @@ const paneDef = {
     }
     return null; // No under other circumstances
   },
-  mintClass: _solidUiJss.ns.pad('Notepad'),
+  mintClass: ns.pad('Notepad'),
   mintNew: function (context, newPaneOptions) {
     const store = context.session.store;
     const updater = store.updater;
@@ -34,19 +28,19 @@ const paneDef = {
     const newInstance = newPaneOptions.newInstance = newPaneOptions.newInstance || store.sym(newPaneOptions.newBase + 'index.ttl#this');
     // const newInstance = kb.sym(newBase + 'pad.ttl#thisPad');
     const newPadDoc = newInstance.doc();
-    store.add(newInstance, _solidUiJss.ns.rdf('type'), _solidUiJss.ns.pad('Notepad'), newPadDoc);
-    store.add(newInstance, _solidUiJss.ns.dc('title'), 'Shared Notes', newPadDoc);
-    store.add(newInstance, _solidUiJss.ns.dc('created'), new Date(), newPadDoc); // @@ TODO Remove casting
+    store.add(newInstance, ns.rdf('type'), ns.pad('Notepad'), newPadDoc);
+    store.add(newInstance, ns.dc('title'), 'Shared Notes', newPadDoc);
+    store.add(newInstance, ns.dc('created'), new Date(), newPadDoc); // @@ TODO Remove casting
     if (newPaneOptions.me) {
-      store.add(newInstance, _solidUiJss.ns.dc('author'), newPaneOptions.me, newPadDoc);
+      store.add(newInstance, ns.dc('author'), newPaneOptions.me, newPadDoc);
     }
     // kb.add(newInstance, ns.pad('next'), newInstance, newPadDoc);
     // linked list empty @@
     const chunk = store.sym(newInstance.uri + '_line0');
-    store.add(newInstance, _solidUiJss.ns.pad('next'), chunk, newPadDoc); // Linked list has one entry
-    store.add(chunk, _solidUiJss.ns.pad('next'), newInstance, newPadDoc);
-    store.add(chunk, _solidUiJss.ns.dc('author'), newPaneOptions.me, newPadDoc);
-    store.add(chunk, _solidUiJss.ns.sioc('content'), '', newPadDoc);
+    store.add(newInstance, ns.pad('next'), chunk, newPadDoc); // Linked list has one entry
+    store.add(chunk, ns.pad('next'), newInstance, newPadDoc);
+    store.add(chunk, ns.dc('author'), newPaneOptions.me, newPadDoc);
+    store.add(chunk, ns.sioc('content'), '', newPadDoc);
     return new Promise(function (resolve, reject) {
       if (!updater) {
         reject(new Error('Have no updater'));
@@ -69,7 +63,7 @@ const paneDef = {
     // Utility functions
     const complainIfBad = function (ok, message) {
       if (!ok) {
-        div.appendChild(_solidUiJss.widgets.errorMessageBlock(dom, message, 'pink'));
+        div.appendChild(widgets.errorMessageBlock(dom, message, 'pink'));
       }
     };
     const clearElement = function (ele) {
@@ -84,27 +78,27 @@ const paneDef = {
     // Two constiations of ACL for this app, public read and public read/write
     // In all cases owner has read write control
     const genACLtext = function (docURI, aclURI, allWrite) {
-      const g = (0, _rdflib.graph)();
-      const auth = (0, _rdflib.Namespace)('http://www.w3.org/ns/auth/acl#');
+      const g = graph();
+      const auth = Namespace('http://www.w3.org/ns/auth/acl#');
       let a = g.sym(aclURI + '#a1');
       const acl = g.sym(aclURI);
       const doc = g.sym(docURI);
-      g.add(a, _solidUiJss.ns.rdf('type'), auth('Authorization'), acl);
+      g.add(a, ns.rdf('type'), auth('Authorization'), acl);
       g.add(a, auth('accessTo'), doc, acl);
       g.add(a, auth('agent'), me, acl);
       g.add(a, auth('mode'), auth('Read'), acl);
       g.add(a, auth('mode'), auth('Write'), acl);
       g.add(a, auth('mode'), auth('Control'), acl);
       a = g.sym(aclURI + '#a2');
-      g.add(a, _solidUiJss.ns.rdf('type'), auth('Authorization'), acl);
+      g.add(a, ns.rdf('type'), auth('Authorization'), acl);
       g.add(a, auth('accessTo'), doc, acl);
-      g.add(a, auth('agentClass'), _solidUiJss.ns.foaf('Agent'), acl);
+      g.add(a, auth('agentClass'), ns.foaf('Agent'), acl);
       g.add(a, auth('mode'), auth('Read'), acl);
       if (allWrite) {
         g.add(a, auth('mode'), auth('Write'), acl);
       }
       // TODO: Figure out why `serialize` isn't on the type definition according to TypeScript:
-      return (0, _rdflib.serialize)(acl, g, aclURI, 'text/turtle');
+      return serialize(acl, g, aclURI, 'text/turtle');
     };
 
     /**
@@ -115,7 +109,7 @@ const paneDef = {
      * @returns {Promise<Response>}
      */
     const setACL = function setACL(docURI, allWrite, callbackFunction) {
-      const aclDoc = store.any((0, _rdflib.sym)(docURI), (0, _rdflib.sym)('http://www.iana.org/assignments/link-relations/acl')); // @@ check that this get set by web.js
+      const aclDoc = store.any(sym(docURI), sym('http://www.iana.org/assignments/link-relations/acl')); // @@ check that this get set by web.js
       if (!fetcher) {
         throw new Error('Have no fetcher');
       }
@@ -132,7 +126,7 @@ const paneDef = {
         return fetcher.load(docURI).catch(err => {
           callbackFunction(false, 'Getting headers for ACL: ' + err);
         }).then(() => {
-          const aclDoc = store.any((0, _rdflib.sym)(docURI), (0, _rdflib.sym)('http://www.iana.org/assignments/link-relations/acl'));
+          const aclDoc = store.any(sym(docURI), sym('http://www.iana.org/assignments/link-relations/acl'));
           if (!aclDoc) {
             // complainIfBad(false, "No Link rel=ACL header for " + docURI);
             throw new Error('No Link rel=ACL header for ' + docURI);
@@ -166,10 +160,10 @@ const paneDef = {
       const appDetails = {
         noun: 'notepad'
       };
-      div.appendChild(_solidUiJss.login.newAppInstance(dom, appDetails, (workspace, newBase) => {
+      div.appendChild(login.newAppInstance(dom, appDetails, (workspace, newBase) => {
         // FIXME: not sure if this will work at all, just
         // trying to get the types to match - Michiel.
-        return initializeNewInstanceInWorkspace(new _rdflib.NamedNode(workspace || newBase));
+        return initializeNewInstanceInWorkspace(new NamedNode(workspace || newBase));
       }));
       div.appendChild(dom.createElement('hr')); // @@
 
@@ -197,14 +191,14 @@ const paneDef = {
     //  Create new document files for new instance of app
     const initializeNewInstanceInWorkspace = function (ws) {
       // @@ TODO Clean up type for newBase
-      let newBase = store.any(ws, _solidUiJss.ns.space('uriPrefix'));
+      let newBase = store.any(ws, ns.space('uriPrefix'));
       if (!newBase) {
         newBase = ws.uri.split('#')[0];
       } else {
         newBase = newBase.value;
       }
       if (newBase.slice(-1) !== '/') {
-        _rdflib.log.error(appPathSegment + ': No / at end of uriPrefix ' + newBase); // @@ paramater?
+        log.error(appPathSegment + ': No / at end of uriPrefix ' + newBase); // @@ paramater?
         newBase = newBase + '/';
       }
       const now = new Date();
@@ -213,7 +207,7 @@ const paneDef = {
       initializeNewInstanceAtBase(thisInstance, newBase);
     };
     const initializeNewInstanceAtBase = function (thisInstance, newBase) {
-      const here = (0, _rdflib.sym)(thisInstance.uri.split('#')[0]);
+      const here = sym(thisInstance.uri.split('#')[0]);
       const base = here; // @@ ???
 
       const newPadDoc = store.sym(newBase + 'pad.ttl');
@@ -247,7 +241,7 @@ const paneDef = {
             if (!store.fetcher) {
               throw new Error('Store has no fetcher');
             }
-            store.fetcher.webCopy(base + item.local, newBase + item.local, item.contentType).then(() => _solidLogicJss.authn.checkUser()).then(webId => {
+            store.fetcher.webCopy(base + item.local, newBase + item.local, item.contentType).then(() => authn.checkUser()).then(webId => {
               me = webId;
               setThatACL();
             }).catch(err => {
@@ -259,20 +253,20 @@ const paneDef = {
         fun(item);
       }
       agenda.push(function createNewPadDataFile() {
-        store.add(newInstance, _solidUiJss.ns.rdf('type'), PAD('Notepad'), newPadDoc);
+        store.add(newInstance, ns.rdf('type'), PAD('Notepad'), newPadDoc);
 
         // TODO @@ Remove casting of add
-        store.add(newInstance, _solidUiJss.ns.dc('created'), new Date(),
+        store.add(newInstance, ns.dc('created'), new Date(),
         // @@ TODO Remove casting
         newPadDoc);
         if (me) {
-          store.add(newInstance, _solidUiJss.ns.dc('author'), me, newPadDoc);
+          store.add(newInstance, ns.dc('author'), me, newPadDoc);
         }
         store.add(newInstance, PAD('next'), newInstance, newPadDoc); // linked list empty
 
         // Keep a paper trail   @@ Revisit when we have non-public ones @@ Privacy
-        store.add(newInstance, _solidUiJss.ns.space('inspiration'), thisInstance, padDoc);
-        store.add(newInstance, _solidUiJss.ns.space('inspiration'), thisInstance, newPadDoc);
+        store.add(newInstance, ns.space('inspiration'), thisInstance, padDoc);
+        store.add(newInstance, ns.space('inspiration'), thisInstance, newPadDoc);
         if (!updater) {
           throw new Error('Have no updater');
         }
@@ -305,19 +299,19 @@ const paneDef = {
     //  Update on incoming changes
     const showResults = function (exists) {
       console.log('showResults()');
-      me = _solidLogicJss.authn.currentUser();
-      _solidLogicJss.authn.checkUser().then(webId => {
+      me = authn.currentUser();
+      authn.checkUser().then(webId => {
         me = webId;
       });
-      const title = store.any(subject, _solidUiJss.ns.dc('title')) || store.any(subject, _solidUiJss.ns.vcard('fn'));
+      const title = store.any(subject, ns.dc('title')) || store.any(subject, ns.vcard('fn'));
       if (paneOptions.solo && typeof window !== 'undefined' && title) {
         window.document.title = title.value;
       }
       options.exists = exists;
-      padEle = _solidUiJss.pad.notepad(dom, padDoc, subject, me, options);
+      padEle = pad.notepad(dom, padDoc, subject, me, options);
       naviMain.appendChild(padEle);
-      const partipationTarget = store.any(subject, _solidUiJss.ns.meeting('parentMeeting')) || subject;
-      _solidUiJss.pad.manageParticipation(dom, naviMiddle2, padDoc, partipationTarget, me, options);
+      const partipationTarget = store.any(subject, ns.meeting('parentMeeting')) || subject;
+      pad.manageParticipation(dom, naviMiddle2, padDoc, partipationTarget, me, options);
       if (!store.updater) {
         throw new Error('Store has no updater');
       }
@@ -353,7 +347,7 @@ const paneDef = {
         } else {
           // Happy read
           clearElement(naviMain);
-          if (store.holds(subject, _solidUiJss.ns.rdf('type'), _solidUiJss.ns.wf('TemplateInstance'))) {
+          if (store.holds(subject, ns.rdf('type'), ns.wf('TemplateInstance'))) {
             showBootstrap(subject, naviMain, 'pad');
           }
           showResults(true);
@@ -368,7 +362,7 @@ const paneDef = {
     const fetcher = store.fetcher;
     const updater = store.updater;
     let me;
-    const PAD = (0, _rdflib.Namespace)('http://www.w3.org/ns/pim/pad#');
+    const PAD = Namespace('http://www.w3.org/ns/pim/pad#');
     const thisInstance = subject;
     const padDoc = subject.doc();
     let padEle;
@@ -407,5 +401,6 @@ const paneDef = {
   }
 };
 // ends
-var _default = exports.default = paneDef;
+
+export default paneDef;
 //# sourceMappingURL=padPane.js.map

@@ -1,14 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createContext = createContext;
-var _index = require("../index");
-function createContext(dom, paneRegistry, store, logic) {
+import { getOutliner } from '../index';
+export function createContext(dom, paneRegistry, store, logic) {
   return {
     dom,
-    getOutliner: _index.getOutliner,
+    getOutliner,
     session: {
       paneRegistry,
       store,

@@ -1,14 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.UserInput = UserInput;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var _solidLogicJss = require("solid-logic-jss");
-var panes = _interopRequireWildcard(require("pane-registry"));
-var $rdf = _interopRequireWildcard(require("rdflib"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* istanbul ignore file */
 // Original author: kennyluck
 //
@@ -22,11 +11,15 @@ function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r
     request: 'from' 'to' 'message' 'Request'
 */
 
+import * as UI from 'solid-ui-jss';
+import { store } from 'solid-logic-jss';
+import * as panes from 'pane-registry';
+import * as $rdf from 'rdflib';
 let UserInputFormula; // Formula to store references of user's work
 let TempFormula; // Formula to store incomplete triples (Requests),
 // temporarily disjoint with kb to avoid bugs
 
-function UserInput(outline) {
+export function UserInput(outline) {
   const myDocument = outline.document; // is this ok?
   // UI.log.warn("myDocument when it's set is "+myDocument.location);
   this.menuId = 'predicateMenu1';
@@ -62,17 +55,17 @@ function UserInput(outline) {
 
   if (!UserInputFormula) {
     UserInputFormula = new $rdf.Formula();
-    UserInputFormula.superFormula = _solidLogicJss.store;
+    UserInputFormula.superFormula = store;
     // UserInputFormula.registerFormula("Your Work");
   }
   if (!TempFormula) TempFormula = new $rdf.IndexedFormula();
   // Use RDFIndexedFormula so add returns the statement
   TempFormula.name = 'TempFormula';
-  if (!_solidLogicJss.store.updater) _solidLogicJss.store.updater = new $rdf.UpdateManager(_solidLogicJss.store);
+  if (!store.updater) store.updater = new $rdf.UpdateManager(store);
   return {
     // updateService: updateService,
 
-    sparqler: _solidLogicJss.store.updater,
+    sparqler: store.updater,
     lastModified: null,
     // the last <input> being modified, .isNew indicates whether it's a new input
     lastModifiedStat: null,
@@ -111,8 +104,8 @@ function UserInput(outline) {
         This.formUndetStat(insertTr, preStat.subject, reqTerm1, reqTerm2, preStat.why, false);
       } else {
         // no previous row: write to the document defining the subject
-        const subject = UI.utils.getAbout(_solidLogicJss.store, UI.utils.ancestor(target.parentNode.parentNode, 'TD'));
-        const doc = _solidLogicJss.store.sym($rdf.Util.uri.docpart(subject.uri));
+        const subject = UI.utils.getAbout(store, UI.utils.ancestor(target.parentNode.parentNode, 'TD'));
+        const doc = store.sym($rdf.Util.uri.docpart(subject.uri));
         This.formUndetStat(insertTr, subject, reqTerm1, reqTerm2, doc, false);
       }
       outline.walk('moveTo', insertTr.firstChild);
@@ -271,7 +264,7 @@ function UserInput(outline) {
         obj = UI.utils.getTerm(target);
         trNode = UI.utils.ancestor(target, 'TR');
       } catch (e) {
-        UI.log.warn('userinput.js: ' + e + UI.utils.getAbout(_solidLogicJss.store, selectedTd));
+        UI.log.warn('userinput.js: ' + e + UI.utils.getAbout(store, selectedTd));
         UI.log.error(target + ' getStatement Error:' + e);
       }
       let tdNode;
@@ -374,12 +367,12 @@ function UserInput(outline) {
           this.clearInputAndSave();
           return;
         } else if (this.lastModified.isNew) {
-          s = new $rdf.Statement(s.subject, s.predicate, _solidLogicJss.store.literal(this.lastModified.value), s.why);
+          s = new $rdf.Statement(s.subject, s.predicate, store.literal(this.lastModified.value), s.why);
           // TODO: DEFINE ERROR CALLBACK
           defaultpropview = this.views.defaults[s.predicate.uri];
           trCache = UI.utils.ancestor(this.lastModified, 'TR');
           try {
-            _solidLogicJss.store.updater.update([], [s], function (uri, success, errorBody) {
+            store.updater.update([], [s], function (uri, success, errorBody) {
               if (!success) {
                 UI.log.error('Error occurs while inserting ' + s + '\n\n' + errorBody + '\n');
                 // UI.log.warn("Error occurs while inserting "+s+'\n\n'+errorBody);
@@ -390,7 +383,7 @@ function UserInput(outline) {
             UI.log.error('Error inserting fact ' + s + ':\n\t' + e + '\n');
             return;
           }
-          s = _solidLogicJss.store.add(s.subject, s.predicate, _solidLogicJss.store.literal(this.lastModified.value), s.why);
+          s = store.add(s.subject, s.predicate, store.literal(this.lastModified.value), s.why);
         } else {
           if (this.statIsInverse) {
             UI.log.error('Invalid Input: a literal can\'t be a subject in RDF/XML');
@@ -407,9 +400,9 @@ function UserInput(outline) {
                 const valueCache = this.lastModified.value;
                 trCache = UI.utils.ancestor(this.lastModified, 'TR');
                 const oldValue = this.lastModified.defaultValue;
-                s2 = $rdf.st(s.subject, s.predicate, _solidLogicJss.store.literal(this.lastModified.value), s.why);
+                s2 = $rdf.st(s.subject, s.predicate, store.literal(this.lastModified.value), s.why);
                 try {
-                  _solidLogicJss.store.updater.update([s], [s2], function (uri, success, errorBody) {
+                  store.updater.update([s], [s2], function (uri, success, errorBody) {
                     if (success) {
                       obj.value = valueCache;
                     } else {
@@ -430,12 +423,12 @@ function UserInput(outline) {
               {
                 // a request refill with text
                 // var newStat
-                const textTerm = _solidLogicJss.store.literal(this.lastModified.value, '');
+                const textTerm = store.literal(this.lastModified.value, '');
                 // <Feature about="labelChoice">
                 if (s.predicate.termType === 'Collection') {
                   // case: add triple   ????????? Weird - tbl
                   const selectedPredicate = s.predicate.elements[0]; //    @@ TBL elements is a list on the predicate??
-                  if (_solidLogicJss.store.any(undefined, selectedPredicate, textTerm)) {
+                  if (store.any(undefined, selectedPredicate, textTerm)) {
                     if (!e) {
                       // keyboard
                       const tdNode = this.lastModified.parentNode;
@@ -444,19 +437,19 @@ function UserInput(outline) {
                       e.pageY = UI.utils.findPos(tdNode)[1] + tdNode.clientHeight;
                     }
                     this.showMenu(e, 'DidYouMeanDialog', undefined, {
-                      dialogTerm: _solidLogicJss.store.any(undefined, selectedPredicate, textTerm),
+                      dialogTerm: store.any(undefined, selectedPredicate, textTerm),
                       bnodeTerm: s.subject
                     });
                   } else {
                     s1 = UI.utils.ancestor(UI.utils.ancestor(this.lastModified, 'TR').parentNode, 'TR').AJAR_statement;
                     s2 = $rdf.st(s.subject, selectedPredicate, textTerm, s.why);
-                    const type = _solidLogicJss.store.the(s.subject, rdf('type'));
-                    s3 = _solidLogicJss.store.anyStatementMatching(s.subject, rdf('type'), type, s.why);
+                    const type = store.the(s.subject, rdf('type'));
+                    s3 = store.anyStatementMatching(s.subject, rdf('type'), type, s.why);
                     // TODO: DEFINE ERROR CALLBACK
                     // because the table is repainted, so...
                     trCache = UI.utils.ancestor(UI.utils.ancestor(this.lastModified, 'TR'), 'TD').parentNode;
                     try {
-                      _solidLogicJss.store.updater.update([], [s1, s2, s3], function (uri, success, errorBody) {
+                      store.updater.update([], [s1, s2, s3], function (uri, success, errorBody) {
                         if (!success) {
                           console.log('Error occurs while editing ' + s1 + '\n\n' + errorBody);
                           outline.UserInput.deleteTriple(trCache.lastChild, true); // @@@@ This
@@ -466,8 +459,8 @@ function UserInput(outline) {
                       console.log('Error occurs while editing ' + s1 + ':\n\t' + e);
                       return;
                     }
-                    _solidLogicJss.store.remove(s);
-                    _solidLogicJss.store.add(s.subject, selectedPredicate, textTerm, s.why); // was: newStat =
+                    store.remove(s);
+                    store.add(s.subject, selectedPredicate, textTerm, s.why); // was: newStat =
                     // a subtle bug occurs here, if foaf:nick hasn't been dereferneced,
                     // this add will cause a repainting
                   }
@@ -480,7 +473,7 @@ function UserInput(outline) {
                   outline.walk('right', outline.focusTd);
                   // </Feature>
                 } else {
-                  this.fillInRequest('object', this.lastModified.parentNode, _solidLogicJss.store.literal(this.lastModified.value));
+                  this.fillInRequest('object', this.lastModified.parentNode, store.literal(this.lastModified.value));
                   return; // The new Td is already generated by fillInRequest, so it's done.
                 }
                 break;
@@ -499,7 +492,7 @@ function UserInput(outline) {
         // UI.log.warn("test .isNew)");
         return;
       } else if (s.predicate.termType === 'Collection') {
-        _solidLogicJss.store.removeMany(s.subject);
+        store.removeMany(s.subject);
         const upperTr = UI.utils.ancestor(UI.utils.ancestor(this.lastModified, 'TR').parentNode, 'TR');
         preStat = upperTr.AJAR_statement;
         reqTerm = this.generateRequest('(To be determined. Re-type of drag an object onto this field)');
@@ -531,7 +524,7 @@ function UserInput(outline) {
       if (!this.statIsInverse) {
         // this is for an old feature
         // outline.replaceTD(outline.outlineObjectTD(s.object, defaultpropview),trNode.lastChild);
-        outline.replaceTD(outline.outlineObjectTD(_solidLogicJss.store.literal(this.lastModified.value), defaultpropview), trNode.lastChild);
+        outline.replaceTD(outline.outlineObjectTD(store.literal(this.lastModified.value), defaultpropview), trNode.lastChild);
       } else {
         outline.replaceTD(outline.outlineObjectTD(s.subject, defaultpropview), trNode.lastChild);
       }
@@ -555,12 +548,12 @@ function UserInput(outline) {
       }
       // var afterTr
       const s = this.getStatementAbout(selectedTd);
-      if (!isBackOut && !_solidLogicJss.store.whether(s.object, rdf('type'), UI.ns.link('Request')) &&
+      if (!isBackOut && !store.whether(s.object, rdf('type'), UI.ns.link('Request')) &&
       // Better to check whether provenance is internal?
-      !_solidLogicJss.store.whether(s.predicate, rdf('type'), UI.ns.link('Request')) && !_solidLogicJss.store.whether(s.subject, rdf('type'), UI.ns.link('Request'))) {
+      !store.whether(s.predicate, rdf('type'), UI.ns.link('Request')) && !store.whether(s.subject, rdf('type'), UI.ns.link('Request'))) {
         UI.log.debug('about to send SPARQLUpdate');
         try {
-          _solidLogicJss.store.updater.update([s], [], function (uri, success, errorBody) {
+          store.updater.update([s], [], function (uri, success, errorBody) {
             if (success) {
               removefromview();
             } else {
@@ -666,12 +659,12 @@ function UserInput(outline) {
             // modify store and update here
             const isInverse = selectedTd.parentNode.AJAR_inverse;
             if (!isInverse) {
-              insertTr.AJAR_statement = _solidLogicJss.store.add(preStat.subject, preStat.predicate, term, preStat.why);
+              insertTr.AJAR_statement = store.add(preStat.subject, preStat.predicate, term, preStat.why);
             } else {
-              insertTr.AJAR_statemnet = _solidLogicJss.store.add(term, preStat.predicate, preStat.object, preStat.why);
+              insertTr.AJAR_statemnet = store.add(term, preStat.predicate, preStat.object, preStat.why);
             }
             try {
-              _solidLogicJss.store.updater.update([], [insertTr.AJAR_statement], function (uri, success, errorBody) {
+              store.updater.update([], [insertTr.AJAR_statement], function (uri, success, errorBody) {
                 if (!success) {
                   UI.log.error('userinput.js (pred selected): Fail trying to insert statement ' + insertTr.AJAR_statement + ': ' + errorBody);
                 }
@@ -747,13 +740,13 @@ function UserInput(outline) {
                    ?pred rdfs:domain ?subjectClass.
                 }
             */
-          subject = UI.utils.getAbout(_solidLogicJss.store, UI.utils.ancestor(selectedTd, 'TABLE').parentNode);
-          subjectClass = _solidLogicJss.store.any(subject, rdf('type'));
+          subject = UI.utils.getAbout(store, UI.utils.ancestor(selectedTd, 'TABLE').parentNode);
+          subjectClass = store.any(subject, rdf('type'));
           sparqlText = [];
           const endl = '.\n';
           sparqlText[0] = 'SELECT ?pred WHERE{\n?pred ' + rdf('type') + rdf('Property') + '.\n' + '?pred ' + UI.ns.rdfs('domain') + subjectClass + '.}'; // \n is required? SPARQL parser bug?
           sparqlText[1] = 'SELECT ?pred ?class\nWHERE{\n' + '?pred ' + rdf('type') + rdf('Property') + '.\n' + subjectClass + UI.ns.rdfs('subClassOf') + ' ?class.\n' + '?pred ' + UI.ns.rdfs('domain') + ' ?class.\n}';
-          sparqlText[2] = 'SELECT ?pred WHERE{\n' + subject + rdf('type') + _solidLogicJss.store.variable('subjectClass') + endl + _solidLogicJss.store.variable('pred') + UI.ns.rdfs('domain') + _solidLogicJss.store.variable('subjectClass') + endl + '}';
+          sparqlText[2] = 'SELECT ?pred WHERE{\n' + subject + rdf('type') + store.variable('subjectClass') + endl + store.variable('pred') + UI.ns.rdfs('domain') + store.variable('subjectClass') + endl + '}';
           predicateQuery = sparqlText.map($rdf.SPARQLToQuery);
         } else {
           // ------selector
@@ -772,8 +765,8 @@ function UserInput(outline) {
                    ?pred rdfs:domain ?subjectClass.
                    ?pred rdfs:range ?objectClass.
             */
-          subject = UI.utils.getAbout(_solidLogicJss.store, UI.utils.ancestor(selectedTd, 'TABLE').parentNode);
-          subjectClass = _solidLogicJss.store.any(subject, rdf('type'));
+          subject = UI.utils.getAbout(store, UI.utils.ancestor(selectedTd, 'TABLE').parentNode);
+          subjectClass = store.any(subject, rdf('type'));
           const object = selectedTd.parentNode.AJAR_statement.object;
           // var objectClass = (object.termType === 'Literal') ? UI.ns.rdfs('Literal') : kb.any(object, rdf('type'))
           // var sparqlText="SELECT ?pred WHERE{\n?pred "+rdf('type')+rdf('Property')+".\n"+
@@ -792,7 +785,7 @@ function UserInput(outline) {
       } else {
         // objectTd
         const predicateTerm = selectedTd.parentNode.AJAR_statement.predicate;
-        if (_solidLogicJss.store.whether(predicateTerm, rdf('type'), UI.ns.owl('DatatypeProperty')) || predicateTerm.termType === 'Collection' || _solidLogicJss.store.whether(predicateTerm, UI.ns.rdfs('range'), UI.ns.rdfs('Literal'))) {
+        if (store.whether(predicateTerm, rdf('type'), UI.ns.owl('DatatypeProperty')) || predicateTerm.termType === 'Collection' || store.whether(predicateTerm, UI.ns.rdfs('range'), UI.ns.rdfs('Literal'))) {
           selectedTd.className = '';
           UI.utils.emptyNode(selectedTd);
           this.lastModified = this.createInputBoxIn(selectedTd, ' (Please Input) ');
@@ -849,7 +842,7 @@ function UserInput(outline) {
           if (menu.lastHighlight) menu.lastHighlight.className = '';
           menu.lastHighlight = item;
           menu.lastHighlight.className = 'activeItem';
-          outline.showURI(UI.utils.getAbout(_solidLogicJss.store, menu.lastHighlight));
+          outline.showURI(UI.utils.getAbout(store, menu.lastHighlight));
         }
         if (enterEvent) {
           // either the real event of the pseudo number passed by OutlineKeypressPanel
@@ -909,7 +902,7 @@ function UserInput(outline) {
                     // If doesn't qualify to be autocomplete, return this random string, since pubsPane checks for "gotdptitle"
                     return 'asGivenTxt';
                   }
-                  const inputTerm = UI.utils.getAbout(_solidLogicJss.store, menu.lastHighlight);
+                  const inputTerm = UI.utils.getAbout(store, menu.lastHighlight);
                   const fillInType = mode === 'predicate' ? 'predicate' : 'object';
                   outline.UserInput.clearMenu();
                   outline.UserInput.fillInRequest(fillInType, InputBox.parentNode, inputTerm);
@@ -1015,7 +1008,7 @@ function UserInput(outline) {
           }
           qp('at end of handler\n^^^^^^^^^^^^^^^^^\n\n');
           setHighlightItem(menu.firstChild.firstChild);
-          outline.showURI(UI.utils.getAbout(_solidLogicJss.store, menu.lastHighlight));
+          outline.showURI(UI.utils.getAbout(store, menu.lastHighlight));
           return 'nothing to return';
         }
       }; // end of return function
@@ -1123,9 +1116,9 @@ function UserInput(outline) {
       if (selectedTd.nextSibling) return 'predicate';
       const predicateTerm = this.getStatementAbout(selectedTd).predicate;
       // var predicateTerm=selectedTd.parentNode.AJAR_statement.predicate;
-      if (_solidLogicJss.store.whether(predicateTerm, UI.ns.rdf('type'), UI.ns.owl('DatatypeProperty')) || _solidLogicJss.store.whether(predicateTerm, UI.ns.rdfs('range'), UI.ns.rdfs('Literal')) || predicateTerm.termType === 'Collection') {
+      if (store.whether(predicateTerm, UI.ns.rdf('type'), UI.ns.owl('DatatypeProperty')) || store.whether(predicateTerm, UI.ns.rdfs('range'), UI.ns.rdfs('Literal')) || predicateTerm.termType === 'Collection') {
         return 'DatatypeProperty-like';
-      } else if (_solidLogicJss.store.whether(predicateTerm, rdf('type'), UI.ns.owl('ObjectProperty'))) {
+      } else if (store.whether(predicateTerm, rdf('type'), UI.ns.owl('ObjectProperty'))) {
         return 'ObjectProperty-like';
       } else {
         return 'no-idea';
@@ -1174,7 +1167,7 @@ function UserInput(outline) {
       outline.UserInput.clearMenu();
       const selectedTd = outline.getSelection()[0];
       const targetdoc = selectedTd.parentNode.AJAR_statement.why;
-      const newTerm = _solidLogicJss.store.nextSymbol(targetdoc);
+      const newTerm = store.nextSymbol(targetdoc);
       outline.UserInput.fillInRequest('object', selectedTd, newTerm);
       // selection is changed
       outline.outlineExpand(outline.getSelection()[0], newTerm);
@@ -1196,7 +1189,7 @@ function UserInput(outline) {
             // this is input box
             if (this.value !== tiptext) {
               const newuri = this.value; // @@ Removed URI "fixup" code
-              This.fillInRequest('object', selectedTd, _solidLogicJss.store.sym(newuri));
+              This.fillInRequest('object', selectedTd, store.sym(newuri));
             }
         }
       }
@@ -1253,7 +1246,7 @@ function UserInput(outline) {
       return insertTr;
     },
     bnode2symbol: function bnode2symbol(bnode, symbol) {
-      _solidLogicJss.store.copyTo(bnode, symbol, ['two-direction', 'delete']);
+      store.copyTo(bnode, symbol, ['two-direction', 'delete']);
     },
     generateRequest: function generateRequest(tipText, trNew, isPredicate, notShow) {
       let trNode;
@@ -1384,7 +1377,7 @@ function UserInput(outline) {
             const target = UI.utils.ancestor(UI.utils.getTarget(e), 'TR');
             if (target.childNodes.length === 2 && target.nextSibling) {
               // Yes
-              _solidLogicJss.store.add(bnodeTerm, IDpredicate, IDterm); // used to connect the two
+              store.add(bnodeTerm, IDpredicate, IDterm); // used to connect the two
               outline.UserInput.clearMenu();
             } else if (target.childNodes.length === 2) {
               outline.UserInput.clearMenu();
@@ -1396,7 +1389,7 @@ function UserInput(outline) {
             const clickedTd = extraInformation.clickedTd;
             selectItem = function selectItem(e) {
               qp('LIMITED P SELECT ITEM!!!!');
-              const selectedPredicate = UI.utils.getAbout(_solidLogicJss.store, UI.utils.getTarget(e));
+              const selectedPredicate = UI.utils.getAbout(store, UI.utils.getTarget(e));
               const predicateChoices = clickedTd.parentNode.AJAR_statement.predicate.elements;
               for (let i = 0; i < predicateChoices.length; i++) {
                 if (predicateChoices[i].sameTerm(selectedPredicate)) {
@@ -1425,7 +1418,7 @@ function UserInput(outline) {
             const selectedTd = extraInformation.selectedTd;
             selectItem = function selectItem(e) {
               qp('WOOHOO');
-              const inputTerm = UI.utils.getAbout(_solidLogicJss.store, UI.utils.getTarget(e));
+              const inputTerm = UI.utils.getAbout(store, UI.utils.getTarget(e));
               qp('GENERAL SELECT ITEM!!!!!!=' + inputTerm);
               qp('target=' + UI.utils.getTarget(e));
               if (isPredicate) {
@@ -1455,7 +1448,7 @@ function UserInput(outline) {
       // build NameSpaces here from knowledge base
       const NameSpaces = {};
       // for each (ontology in ontologies)
-      _solidLogicJss.store.each(undefined, UI.ns.rdf('type'), UI.ns.owl('Ontology')).forEach(function (ontology) {
+      store.each(undefined, UI.ns.rdf('type'), UI.ns.owl('Ontology')).forEach(function (ontology) {
         const label = UI.utils.label(ontology);
         if (!label) return;
         // this is like extracting metadata from URI. Maybe it's better not to take the abbrevs.
@@ -1514,15 +1507,15 @@ function UserInput(outline) {
             const h1 = table.appendChild(myDocument.createElement('tr'));
             const h1th = h1.appendChild(myDocument.createElement('th'));
             h1th.appendChild(myDocument.createTextNode('Did you mean...'));
-            const plist = _solidLogicJss.store.statementsMatching(dialogTerm);
+            const plist = store.statementsMatching(dialogTerm);
             let i;
             for (i = 0; i < plist.length; i++) {
-              if (_solidLogicJss.store.whether(plist[i].predicate, rdf('type'), UI.ns.owl('InverseFunctionalProperty'))) {
+              if (store.whether(plist[i].predicate, rdf('type'), UI.ns.owl('InverseFunctionalProperty'))) {
                 break;
               }
             }
             const IDpredicate = plist[i].predicate;
-            const IDterm = _solidLogicJss.store.any(dialogTerm, plist[i].predicate);
+            const IDterm = store.any(dialogTerm, plist[i].predicate);
             const text = UI.utils.label(dialogTerm) + ' who has ' + UI.utils.label(IDpredicate) + ' ' + IDterm + '?';
             const h2 = table.appendChild(myDocument.createElement('tr'));
             const h2th = h2.appendChild(myDocument.createElement('th'));
@@ -1553,7 +1546,7 @@ function UserInput(outline) {
               tempQuery.vars = [];
               tempQuery.vars.push('Kenny');
               const tempBinding = {};
-              tempBinding.Kenny = _solidLogicJss.store.fromNT(predicates[i].NT);
+              tempBinding.Kenny = store.fromNT(predicates[i].NT);
               try {
                 addPredicateChoice(tempQuery)(tempBinding);
               } catch (e) {
@@ -1635,12 +1628,12 @@ function UserInput(outline) {
             console.log('\n===start JournalTitleAutoComplete\n');
 
             // Gets all the URI's with type Journal in the knowledge base
-            const juris = _solidLogicJss.store.each(undefined, rdf('type'), bibo('Journal'));
+            const juris = store.each(undefined, rdf('type'), bibo('Journal'));
             const matchedtitle = []; // debugging display before inserts into menu
 
             for (let i = 0; i < juris.length; i++) {
               const juri = juris[i];
-              const jtitle = _solidLogicJss.store.each(juri, dcelems('title'), undefined);
+              const jtitle = store.each(juri, dcelems('title'), undefined);
               const jtstr = jtitle + '';
               const matchstr = inputText.toLowerCase();
               const jTitleLowerCase = jtstr.toLowerCase();
@@ -1665,11 +1658,11 @@ function UserInput(outline) {
           }
         case 'LimitedPredicateChoice':
           {
-            const choiceTerm = UI.utils.getAbout(_solidLogicJss.store, extraInformation.clickedTd);
+            const choiceTerm = UI.utils.getAbout(store, extraInformation.clickedTd);
             // because getAbout relies on kb.fromNT, which does not deal with
             // the 'Collection' termType. This termType is ambiguous anyway.
             choiceTerm.termType = 'Collection';
-            const choices = _solidLogicJss.store.each(choiceTerm, UI.ns.link('element'));
+            const choices = store.each(choiceTerm, UI.ns.link('element'));
             for (let i = 0; i < choices.length; i++) {
               addMenuItem(choices[i]);
             }
@@ -1688,14 +1681,14 @@ function UserInput(outline) {
             switch (inputQuery.constructor.name) {
               case 'Array':
                 for (let i = 0; i < inputQuery.length; i++) {
-                  _solidLogicJss.store.query(inputQuery[i], addPredicateChoice(inputQuery[i]), nullFetcher);
+                  store.query(inputQuery[i], addPredicateChoice(inputQuery[i]), nullFetcher);
                 }
                 break;
               case 'undefined':
                 throw new Error('addPredicateChoice: query is not defined');
               // break
               default:
-                _solidLogicJss.store.query(inputQuery, addPredicateChoice(inputQuery), nullFetcher);
+                store.query(inputQuery, addPredicateChoice(inputQuery), nullFetcher);
             }
           }
       }
@@ -1714,7 +1707,7 @@ function UserInput(outline) {
       // RDF Event
 
       let eventhandler;
-      if (_solidLogicJss.store.any(reqTerm, UI.ns.link('onfillin'))) {
+      if (store.any(reqTerm, UI.ns.link('onfillin'))) {
         /*    2017 -- Not sure what is supposed to happen here -- timbl @@@@
         eventhandler = function(subject) {
           return kb.any(reqTerm, UI.ns.link('onfillin')).value)
@@ -1727,9 +1720,9 @@ function UserInput(outline) {
         if (selectedTd.nextSibling.className !== 'undetermined') {
           const s = new $rdf.Statement(stat.subject, inputTerm, stat.object, stat.why);
           try {
-            _solidLogicJss.store.updater.update([], [s], function (uri, success, errorBody) {
+            store.updater.update([], [s], function (uri, success, errorBody) {
               if (success) {
-                newStat = _solidLogicJss.store.anyStatementMatching(stat.subject, inputTerm, stat.object, stat.why);
+                newStat = store.anyStatementMatching(stat.subject, inputTerm, stat.object, stat.why);
                 tr.AJAR_statement = newStat;
                 newTd.className = newTd.className.replace(/ pendingedit/g, '');
               } else {
@@ -1765,15 +1758,15 @@ function UserInput(outline) {
             s = new $rdf.Statement(inputTerm, stat.predicate, stat.object, stat.why);
           }
           try {
-            _solidLogicJss.store.updater.update([], [s], function (uri, success, _errorBody) {
+            store.updater.update([], [s], function (uri, success, _errorBody) {
               UI.log.info('@@ usinput.js (object) callback ok=' + success + ' for statement:' + s + '\n ');
               let newStats;
               if (success) {
                 newTd.className = newTd.className.replace(/ pendingedit/g, ''); // User feedback
                 if (!isInverse) {
-                  newStats = _solidLogicJss.store.statementsMatching(stat.subject, stat.predicate, inputTerm, stat.why);
+                  newStats = store.statementsMatching(stat.subject, stat.predicate, inputTerm, stat.why);
                 } else {
-                  newStats = _solidLogicJss.store.statementsMatching(inputTerm, stat.predicate, stat.object, stat.why);
+                  newStats = store.statementsMatching(inputTerm, stat.predicate, stat.object, stat.why);
                 }
                 if (!newStats.length) {
                   UI.log.error('userinput.js 1711: Can\'t find statememt!');

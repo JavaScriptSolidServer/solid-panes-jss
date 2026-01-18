@@ -1,10 +1,4 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _default = dom => function viewAsMbox(obj) {
+export default dom => function viewAsMbox(obj) {
   const anchor = dom.createElement('a');
   // previous implementation assumed email address was Literal. fixed.
 
@@ -18,5 +12,4 @@ var _default = dom => function viewAsMbox(obj) {
   anchor.appendChild(dom.createTextNode(address));
   return anchor;
 };
-exports.default = _default;
 //# sourceMappingURL=viewAsMbox.js.map

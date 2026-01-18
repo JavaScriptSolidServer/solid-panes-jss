@@ -1,12 +1,6 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.generateHomepage = generateHomepage;
-var _rdflib = require("rdflib");
-var _solidUiJss = require("solid-ui-jss");
-async function generateHomepage(subject, store, fetcher) {
+import { sym } from 'rdflib';
+import { ns } from 'solid-ui-jss';
+export async function generateHomepage(subject, store, fetcher) {
   const ownersProfile = await loadProfile(subject, fetcher);
   const name = getName(store, ownersProfile);
   const wrapper = document.createElement('div');
@@ -44,11 +38,11 @@ function createTitle(uri, name) {
 async function loadProfile(subject, fetcher) {
   const pod = subject.site().uri;
   // TODO: This is a hack - we cannot assume that the profile is at this document, but we will live with it for now
-  const webId = (0, _rdflib.sym)(`${pod}profile/card#me`);
+  const webId = sym(`${pod}profile/card#me`);
   await fetcher.load(webId);
   return webId;
 }
 function getName(store, ownersProfile) {
-  return store.anyValue(ownersProfile, _solidUiJss.ns.vcard('fn'), null, ownersProfile.doc()) || store.anyValue(ownersProfile, _solidUiJss.ns.foaf('name'), null, ownersProfile.doc()) || new URL(ownersProfile.uri).host.split('.')[0];
+  return store.anyValue(ownersProfile, ns.vcard('fn'), null, ownersProfile.doc()) || store.anyValue(ownersProfile, ns.foaf('name'), null, ownersProfile.doc()) || new URL(ownersProfile.uri).host.split('.')[0];
 }
 //# sourceMappingURL=homepage.js.map

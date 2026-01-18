@@ -1,25 +1,19 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidUiJss = require("solid-ui-jss");
 /*   Tabbed view of anything
  **
  ** data-driven
  **
  */
 
+import { icons, ns, tabs, widgets } from 'solid-ui-jss';
 const TabbedPane = {
-  icon: _solidUiJss.icons.iconBase + 'noun_688606.svg',
+  icon: icons.iconBase + 'noun_688606.svg',
   name: 'tabbed',
-  audience: [_solidUiJss.ns.solid('PowerUser')],
+  audience: [ns.solid('PowerUser')],
   // Does the subject deserve this pane?
   label: (subject, context) => {
     const kb = context.session.store;
     const typeURIs = kb.findTypeURIs(subject);
-    if (_solidUiJss.ns.meeting('Cluster').uri in typeURIs) {
+    if (ns.meeting('Cluster').uri in typeURIs) {
       return 'Tabbed';
     }
     return null;
@@ -33,26 +27,26 @@ const TabbedPane = {
         throw new Error('Store has no fetcher');
       }
       await store.fetcher.load(subject);
-      div.appendChild(_solidUiJss.tabs.tabWidget({
+      div.appendChild(tabs.tabWidget({
         dom,
         subject,
-        predicate: store.any(subject, _solidUiJss.ns.meeting('predicate')) || _solidUiJss.ns.meeting('toolList'),
+        predicate: store.any(subject, ns.meeting('predicate')) || ns.meeting('toolList'),
         ordered: true,
-        orientation: store.anyValue(subject, _solidUiJss.ns.meeting('orientation')) || '0',
+        orientation: store.anyValue(subject, ns.meeting('orientation')) || '0',
         renderMain: (containerDiv, item) => {
           containerDiv.innerHTML = '';
           const table = containerDiv.appendChild(context.dom.createElement('table'));
           context.getOutliner(context.dom).GotoSubject(item, true, null, false, undefined, table);
         },
         renderTab: (containerDiv, item) => {
-          const predicate = store.the(subject, _solidUiJss.ns.meeting('predicate'));
-          containerDiv.appendChild(_solidUiJss.widgets.personTR(context.dom, predicate, item, {}));
+          const predicate = store.the(subject, ns.meeting('predicate'));
+          containerDiv.appendChild(widgets.personTR(context.dom, predicate, item, {}));
         },
-        backgroundColor: store.anyValue(subject, _solidUiJss.ns.ui('backgroundColor')) || '#ddddcc'
+        backgroundColor: store.anyValue(subject, ns.ui('backgroundColor')) || '#ddddcc'
       }));
     })();
     return div;
   }
 };
-var _default = exports.default = TabbedPane;
+export default TabbedPane;
 //# sourceMappingURL=tabbedPane.js.map

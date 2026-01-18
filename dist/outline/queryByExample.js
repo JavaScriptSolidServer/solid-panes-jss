@@ -1,15 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.QuerySource = QuerySource;
-exports.makeQueryRow = makeQueryRow;
-exports.viewAndSaveQuery = viewAndSaveQuery;
-var _solidLogicJss = require("solid-logic-jss");
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var $rdf = _interopRequireWildcard(require("rdflib"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* istanbul ignore file */
 // The query-by-example functionality in the tabulator
 // was the ability to expore a bit of the web in outline mode,
@@ -18,6 +6,9 @@ function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r
 // to find all other places which had the same pattern.
 // Fields could be optional by pressing th ewhite optoional button
 
+import { store } from 'solid-logic-jss';
+import * as UI from 'solid-ui-jss';
+import * as $rdf from 'rdflib';
 const optionalSubqueriesIndex = [];
 function predParentOf(node) {
   let n = node;
@@ -32,7 +23,7 @@ function predParentOf(node) {
     }
   }
 }
-function makeQueryRow(q, tr, constraint) {
+export function makeQueryRow(q, tr, constraint) {
   // predtr = predParentOf(tr)
   // var nodes = tr.childNodes
   // var n = tr.childNodes.length
@@ -81,7 +72,7 @@ function makeQueryRow(q, tr, constraint) {
     }
   }
   if (opt) {
-    const optForm = _solidLogicJss.store.formula();
+    const optForm = store.formula();
     optionalSubqueriesIndex.push(optForm);
     predtr.setAttribute('optionalSubqueriesIndex', optionalSubqueriesIndex.length - 1);
     pat.optional.push(optForm);
@@ -101,7 +92,7 @@ function makeQueryRow(q, tr, constraint) {
     parentVar = inverse ? st.object : st.subject; // if there is no parents, uses the sub/obj
   }
   // UI.log.debug('Initial variable: '+tr.AJAR_variable)
-  const v = tr.AJAR_variable ? tr.AJAR_variable : _solidLogicJss.store.variable(UI.utils.newVariableName());
+  const v = tr.AJAR_variable ? tr.AJAR_variable : store.variable(UI.utils.newVariableName());
   q.vars.push(v);
   v.label = hasParent ? parentVar.label : UI.utils.label(parentVar);
   v.label += ' ' + UI.utils.predicateLabelForXML(st.predicate, inverse);
@@ -177,7 +168,7 @@ function saveQuery(selection, qs) {
 
 // When the user asks for all list of all matching parts of the data
 //
-function viewAndSaveQuery(outline, selection) {
+export function viewAndSaveQuery(outline, selection) {
   const qs = outline.qs;
   UI.log.info('outline.doucment is now ' + outline.document.location);
   const q = saveQuery(selection, qs);
@@ -203,7 +194,7 @@ function viewAndSaveQuery(outline, selection) {
  * @author jambo
  */
 
-function QuerySource() {
+export function QuerySource() {
   /**
    * stores all of the queries currently held by this source,
    * indexed by ID number.

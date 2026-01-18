@@ -1,17 +1,12 @@
-"use strict";
+import { initFooter } from 'solid-ui-jss';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createFooter = createFooter;
-var _solidUiJss = require("solid-ui-jss");
 /**
  * links in the footer
 */
 const SOLID_PROJECT_URL = 'https://solidproject.org';
 const SOLID_PROJECT_NAME = 'solidproject.org';
-function createFooter(store) {
-  (0, _solidUiJss.initFooter)(store, setFooterOptions());
+export function createFooter(store) {
+  initFooter(store, setFooterOptions());
 }
 function setFooterOptions() {
   return {

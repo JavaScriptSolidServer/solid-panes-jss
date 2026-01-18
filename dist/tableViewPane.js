@@ -1,11 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.tableViewPane = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 // Format an array of RDF statements as an HTML table.
 //
 // This can operate in one of three modes: when the class of object is given
@@ -23,8 +15,8 @@ function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r
 // ///////////////////////////////////////////////////////////////////
 
 // Table view pane  -- view of a class as a table of properties of class members
-
-const tableViewPane = exports.tableViewPane = {
+import * as UI from 'solid-ui-jss';
+export const tableViewPane = {
   icon: UI.icons.originalIconBase + 'table.png',
   name: 'tableOfClass',
   label: function (subject, context) {

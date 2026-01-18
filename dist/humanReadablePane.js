@@ -1,22 +1,14 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var _solidUiJss = require("solid-ui-jss");
-var _rdflib = require("rdflib");
-var _marked = require("marked");
-var _dompurify = _interopRequireDefault(require("dompurify"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /*   Human-readable Pane
  **
  **  This outline pane contains the document contents for an HTML document
  **  This is for peeking at a page, because the user might not want to leave the data browser.
  */
-
+import { icons, ns } from 'solid-ui-jss';
+import { Util } from 'rdflib';
+import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 const humanReadablePane = {
-  icon: _solidUiJss.icons.originalIconBase + 'tango/22-text-x-generic.png',
+  icon: icons.originalIconBase + 'tango/22-text-x-generic.png',
   name: 'humanReadable',
   label: function (subject, context) {
     const kb = context.session.store;
@@ -42,7 +34,7 @@ const humanReadablePane = {
     const hasContentTypeIn2 = function (kb, x, displayables) {
       const t = kb.findTypeURIs(x);
       for (let k = 0; k < displayables.length; k++) {
-        if (_rdflib.Util.mediaTypeClass(displayables[k]).uri in t) {
+        if (Util.mediaTypeClass(displayables[k]).uri in t) {
           return true;
         }
       }
@@ -51,7 +43,7 @@ const humanReadablePane = {
     if (!subject.uri) return null; // no bnodes
 
     const t = kb.findTypeURIs(subject);
-    if (t[_solidUiJss.ns.link('WebPage').uri]) return 'view';
+    if (t[ns.link('WebPage').uri]) return 'view';
     if (hasContentTypeIn(kb, subject, allowed) || hasContentTypeIn2(kb, subject, allowed)) {
       return 'View';
     }
@@ -94,8 +86,8 @@ const humanReadablePane = {
       kb.fetcher.webOperation('GET', subject.uri).then(response => {
         const markdownText = response.responseText;
         const lines = Math.min(30, markdownText.split(/\n/).length + 5);
-        const res = _marked.marked.parse(markdownText);
-        const clean = _dompurify.default.sanitize(res);
+        const res = marked.parse(markdownText);
+        const clean = DOMPurify.sanitize(res);
         frame.innerHTML = clean;
         frame.setAttribute('class', 'doc');
         frame.setAttribute('style', `border: 1px solid; padding: 1em; height: ${lines}em; width: 800px; resize: both; overflow: auto;`);
@@ -131,5 +123,6 @@ const humanReadablePane = {
     return div;
   }
 };
-var _default = exports.default = humanReadablePane; // ends
+export default humanReadablePane;
+// ends
 //# sourceMappingURL=humanReadablePane.js.map

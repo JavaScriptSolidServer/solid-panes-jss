@@ -1,25 +1,19 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.schedulePane = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var _solidLogicJss = require("solid-logic-jss");
-var $rdf = _interopRequireWildcard(require("rdflib"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /*   Scheduler Pane
  **
  **
  */
 /* global alert */
+
+import * as UI from 'solid-ui-jss';
+import { authn } from 'solid-logic-jss';
+import * as $rdf from 'rdflib';
 /* babel-plugin-inline-import './formsForSchedule.ttl' */
 const formText = "@prefix dc: <http://purl.org/dc/elements/1.1/>.\n@prefix foaf: <http://xmlns.com/foaf/0.1/>.\n@prefix cal: <http://www.w3.org/2002/12/cal/ical#>.\n@prefix ui: <http://www.w3.org/ns/ui#>.\n@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>.\n@prefix sched: <http://www.w3.org/ns/pim/schedule#>.\n\n   cal:Vevent ui:annotationForm <#form2>, <#form3>; ui:creationForm <#form1> .\n\n<#bigForm>\n    dc:title\n       \"Schedule event (single form).\";\n    a    ui:Group;\n    ui:parts ( <#form1> <#form2> <#form3> ).\n\n<#form1>\n    dc:title\n       \"Schedule an event (wizard)\";\n    a    ui:Form;\n    ui:parts (\n        <#form1header>\n        <#eventTitle>\n        <#eventLocation>\n        <#eventType>\n        <#eventSwitch>\n        <#eventComment>\n        <#eventAuthor> ).\n\n<#form1header> a ui:Heading; ui:contents \"Schedule an event\" .\n\n<#eventTitle>\n    a    ui:SingleLineTextField;\n    ui:maxLength\n       \"128\";\n    ui:property\n       cal:summary;\n    ui:size\n       \"40\".\n\n<#eventLocation>\n    a    ui:SingleLineTextField;\n    ui:maxLength\n       \"512\";\n    ui:property\n       cal:location;\n    ui:size\n       \"40\".\n\n<#eventType> a ui:BooleanField;\n  ui:property sched:allDay;\n  ui:default true . # Used to be the only way\n\n<#eventSwitch> a ui:Options;\n  ui:dependingOn sched:allDay;\n  ui:case [ ui:for true; ui:use <#AllDayForm> ];\n  ui:case [ ui:for false; ui:use <#NotAllDayForm> ].\n\n  <#AllDayForm> a ui:IntegerField ;\n    ui:property sched:durationInDays;\n    ui:label \"How many days?\";\n    ui:min 1;\n    ui:default 1 .\n\n  <#NotAllDayForm> a ui:IntegerField ;\n    ui:property sched:durationInMinutes;\n    ui:label \"Duration (mins)\";\n    ui:min 5;\n    ui:default 55 .\n\n<#eventComment>\n    a    ui:MultiLineTextField;\n#    ui:maxLength\n#       \"1048\";\n#    ui:size\n#       \"40\".\n    ui:property\n       cal:comment.\n\n<#eventAuthor>\n   a ui:Multiple; ui:min 1; ui:part <#eventAuthorGroup>; ui:property dc:author.\n\n   <#eventAuthorGroup> a ui:Group; ui:parts ( <#authorName> <#authorEmail> ) .\n   <#authorName> a ui:SingleLineTextField; ui:property foaf:name .\n   <#authorEmail> a ui:EmailField; ui:label \"email\"; ui:property foaf:mbox .\n\n\n#####################\n\n<#form2> dc:title \"Select possible days or times\"; a ui:Form;\n        ui:parts ( <#id1118132113134> <#possibleSwitch> ).\n\n    <#id1118132113134> a ui:Heading; ui:contents \"Time proposals\" .\n\n    <#possibleSwitch> a ui:Options;\n      ui:dependingOn sched:allDay;\n      ui:case [ ui:for true; ui:use <#AllDayForm2> ];\n      ui:case [ ui:for false; ui:use <#NotAllDayForm2> ].\n\n      <#AllDayForm2>\n      a ui:Multiple; ui:min 2; ui:part <#posssibleDate>; ui:property sched:option.\n        <#posssibleDate> a ui:DateField; ui:property cal:dtstart; ui:label \"date\".\n\n      <#NotAllDayForm2>\n      a ui:Multiple; ui:min 2; ui:part <#posssibleTime>; ui:property sched:option.\n        <#posssibleTime> a ui:DateTimeField; ui:property cal:dtstart; ui:label \"date and time\".\n\n   ##################################\n\n   <#form3> dc:title \"Select invited people\"; a ui:Form; ui:parts  ( <#id1118132113135> <#id1417314641301b> ) .\n<#id1417314641301b>\n   a ui:Multiple; ui:min 1; ui:part <#id1417314674292b>; ui:property sched:invitee.\n   <#id1417314674292b> a ui:EmailField; ui:label \"email\"; ui:property foaf:mbox .\n   <#id1118132113135> a ui:Heading; ui:contents \"Who to invite\" .\n\n# ENDS\n";
 const ns = UI.ns;
 
 // @@ Give other combos too-- see schedule ontology
 const possibleAvailabilities = [ns.sched('No'), ns.sched('Maybe'), ns.sched('Yes')];
-const schedulePane = exports.schedulePane = {
+export const schedulePane = {
   icon: UI.icons.iconBase + 'noun_346777.svg',
   // @@ better?
 
@@ -118,7 +112,7 @@ const schedulePane = exports.schedulePane = {
       // Body of mintNew
       const fetcher = kb.fetcher;
       const updater = kb.updater;
-      let me = options.me || _solidLogicJss.authn.currentUser();
+      let me = options.me || authn.currentUser();
       if (!me) {
         console.log('MUST BE LOGGED IN');
         alert('NOT LOGGED IN');
@@ -164,7 +158,7 @@ const schedulePane = exports.schedulePane = {
                 }
               });
             };
-            kb.fetcher.webCopy(base + item.local, newBase + item.local, item.contentType).then(() => _solidLogicJss.authn.checkUser()).then(webId => {
+            kb.fetcher.webCopy(base + item.local, newBase + item.local, item.contentType).then(() => authn.checkUser()).then(webId => {
               me = webId;
               setThatACL();
             }).catch(err => {
@@ -275,7 +269,7 @@ const schedulePane = exports.schedulePane = {
       }
     };
     let me;
-    _solidLogicJss.authn.checkUser().then(webId => {
+    authn.checkUser().then(webId => {
       me = webId;
       if (logInOutButton) {
         logInOutButton.refresh();
@@ -355,7 +349,7 @@ const schedulePane = exports.schedulePane = {
     };
     const showAppropriateDisplay = function showAppropriateDisplay() {
       console.log('showAppropriateDisplay()');
-      _solidLogicJss.authn.checkUser().then(webId => {
+      authn.checkUser().then(webId => {
         if (!webId) {
           return showSignon();
         }

@@ -1,15 +1,9 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.createHeader = createHeader;
-var _solidLogicJss = require("solid-logic-jss");
-var _solidUiJss = require("solid-ui-jss");
+import { authSession, authn } from 'solid-logic-jss';
+import { icons, initHeader } from 'solid-ui-jss';
 /**
  * menu icons
 */
-const HELP_MENU_ICON = _solidUiJss.icons.iconBase + 'noun_help.svg';
+const HELP_MENU_ICON = icons.iconBase + 'noun_help.svg';
 const SOLID_ICON_URL = 'https://solidproject.org/assets/img/solid-emblem.svg';
 
 /**
@@ -24,8 +18,8 @@ const LOG_OUT_MENU_ITEM = 'Log out';
  */
 const USER_GUIDE_MENU_URL = 'https://solidos.github.io/userguide/';
 const REPORT_A_PROBLEM_MENU_URL = 'https://github.com/solidos/solidos/issues';
-async function createHeader(store, outliner) {
-  (0, _solidUiJss.initHeader)(store, await setUserMenu(outliner), setHeaderOptions());
+export async function createHeader(store, outliner) {
+  initHeader(store, await setUserMenu(outliner), setHeaderOptions());
 }
 function setHeaderOptions() {
   const helpMenuList = [{
@@ -53,7 +47,7 @@ async function setUserMenu(outliner) {
   const logOut = {
     label: LOG_OUT_MENU_ITEM,
     onclick: () => {
-      _solidLogicJss.authSession.logout();
+      authSession.logout();
     }
   };
 
@@ -66,7 +60,7 @@ async function setUserMenu(outliner) {
 
 // Does not work to jump to user profile,
 function openUserProfile(outliner) {
-  outliner.GotoSubject(_solidLogicJss.authn.currentUser(), true, undefined, true, undefined);
+  outliner.GotoSubject(authn.currentUser(), true, undefined, true, undefined);
   location.reload();
 }
 async function getMenuItems(outliner) {

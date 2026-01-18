@@ -1,34 +1,25 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = _default;
-var paneRegistry = _interopRequireWildcard(require("pane-registry"));
-var $rdf = _interopRequireWildcard(require("rdflib"));
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var _solidLogicJss = require("solid-logic-jss");
-var _propertyViews = require("./propertyViews");
-var _outlineIcons = require("./outlineIcons.js");
-var _userInput = require("./userInput.js");
-var queryByExample = _interopRequireWildcard(require("./queryByExample.js"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /* istanbul ignore file */
 /* -*- coding: utf-8-dos -*-
    Outline Mode Manager
 */
-
-// @@ chec
+import * as paneRegistry from 'pane-registry';
+import * as $rdf from 'rdflib';
+import * as UI from 'solid-ui-jss';
+import { authn, authSession, store } from 'solid-logic-jss';
+import { propertyViews } from './propertyViews';
+import { outlineIcons } from './outlineIcons.js'; // @@ chec
+import { UserInput } from './userInput.js';
+import * as queryByExample from './queryByExample.js';
 
 /* global alert XPathResult sourceWidget */
 // XPathResult?
 
 // const iconHeight = '24px'
 
-function _default(context) {
+export default function (context) {
   const dom = context.dom;
   this.document = context.dom;
-  this.outlineIcons = _outlineIcons.outlineIcons;
+  this.outlineIcons = outlineIcons;
   this.labeller = this.labeller || {};
   this.labeller.LanguagePreference = ''; // for now
   const outline = this; // Kenny: do we need this?
@@ -37,15 +28,15 @@ function _default(context) {
   this.selection = selection;
   this.ancestor = UI.utils.ancestor; // make available as outline.ancestor in callbacks
   this.sparql = $rdf.UpdateManager;
-  this.kb = _solidLogicJss.store;
-  const kb = _solidLogicJss.store;
-  const sf = _solidLogicJss.store.fetcher;
+  this.kb = store;
+  const kb = store;
+  const sf = store.fetcher;
   dom.outline = this;
   this.qs = new queryByExample.QuerySource(); // Track queries in queryByExample
 
   // var selection = []  // Array of statements which have been selected
   // this.focusTd // the <td> that is being observed
-  this.UserInput = new _userInput.UserInput(this);
+  this.UserInput = new UserInput(this);
   this.clipboardAddress = 'tabulator:clipboard'; // Weird
   this.UserInput.clipboardInit(this.clipboardAddress);
   const outlineElement = this.outlineElement;
@@ -73,7 +64,7 @@ function _default(context) {
   //  Represent an object in summary form as a table cell
 
   function appendRemoveIcon(node, subject, removeNode) {
-    const image = UI.utils.AJARImage(_outlineIcons.outlineIcons.src.icon_remove_node, 'remove', undefined, dom);
+    const image = UI.utils.AJARImage(outlineIcons.src.icon_remove_node, 'remove', undefined, dom);
     image.addEventListener('click', removeNodeIconMouseDownListener);
     // image.setAttribute('align', 'right')  Causes icon to be moved down
     image.node = removeNode;
@@ -103,32 +94,32 @@ function _default(context) {
     let icon, alt, listener;
     switch (state) {
       case 'unrequested':
-        icon = _outlineIcons.outlineIcons.src.icon_unrequested;
+        icon = outlineIcons.src.icon_unrequested;
         alt = 'fetch';
         listener = unrequestedIconMouseDownListener;
         break;
       case 'requested':
-        icon = _outlineIcons.outlineIcons.src.icon_requested;
+        icon = outlineIcons.src.icon_requested;
         alt = 'fetching';
         listener = failedIconMouseDownListener; // new: can retry yello blob
         break;
       case 'fetched':
-        icon = _outlineIcons.outlineIcons.src.icon_fetched;
+        icon = outlineIcons.src.icon_fetched;
         listener = fetchedIconMouseDownListener;
         alt = 'loaded';
         break;
       case 'failed':
-        icon = _outlineIcons.outlineIcons.src.icon_failed;
+        icon = outlineIcons.src.icon_failed;
         alt = 'failed';
         listener = failedIconMouseDownListener;
         break;
       case 'unpermitted':
-        icon = _outlineIcons.outlineIcons.src.icon_failed;
+        icon = outlineIcons.src.icon_failed;
         listener = failedIconMouseDownListener;
         alt = 'no perm';
         break;
       case 'unfetchable':
-        icon = _outlineIcons.outlineIcons.src.icon_failed;
+        icon = outlineIcons.src.icon_failed;
         listener = failedIconMouseDownListener;
         alt = 'cannot fetch';
         break;
@@ -136,7 +127,7 @@ function _default(context) {
         UI.log.error('?? state = ' + state);
         break;
     } // switch
-    const img = UI.utils.AJARImage(icon, alt, _outlineIcons.outlineIcons.tooltips[icon].replace(/[Tt]his resource/, docuri), dom);
+    const img = UI.utils.AJARImage(icon, alt, outlineIcons.tooltips[icon].replace(/[Tt]his resource/, docuri), dom);
     img.setAttribute('uri', uri);
     img.addEventListener('click', listener); // @@ seemed to be missing 2017-08
     addButtonCallbacks(img, docuri);
@@ -213,11 +204,11 @@ function _default(context) {
     predicateTD.appendChild(labelTD);
     labelTD.style.width = '100%';
     predicateTD.appendChild(termWidget.construct(dom)); // termWidget is global???
-    for (const w in _outlineIcons.outlineIcons.termWidgets) {
+    for (const w in outlineIcons.termWidgets) {
       if (!newTr || !newTr.AJAR_statement) break; // case for TBD as predicate
       // alert(Icon.termWidgets[w]+'   '+Icon.termWidgets[w].filter)
-      if (_outlineIcons.outlineIcons.termWidgets[w].filter && _outlineIcons.outlineIcons.termWidgets[w].filter(newTr.AJAR_statement, 'pred', inverse)) {
-        termWidget.addIcon(predicateTD, _outlineIcons.outlineIcons.termWidgets[w]);
+      if (outlineIcons.termWidgets[w].filter && outlineIcons.termWidgets[w].filter(newTr.AJAR_statement, 'pred', inverse)) {
+        termWidget.addIcon(predicateTD, outlineIcons.termWidgets[w]);
       }
     }
 
@@ -243,7 +234,7 @@ function _default(context) {
   async function globalAppTabs(options = {}) {
     console.log('globalAppTabs @@');
     const div = dom.createElement('div');
-    const me = _solidLogicJss.authn.currentUser();
+    const me = authn.currentUser();
     if (!me) {
       alert('Must be logged in for this');
       throw new Error('Not logged in');
@@ -258,7 +249,7 @@ function _default(context) {
       const pane = paneRegistry.byName(item.paneName); // 20190701
       containerDiv.innerHTML = '';
       const table = containerDiv.appendChild(dom.createElement('table'));
-      const me = _solidLogicJss.authn.currentUser();
+      const me = authn.currentUser();
       thisOutline.GotoSubject(item.subject || me, true, pane, false, undefined, table);
     }
     div.appendChild(UI.tabs.tabWidget({
@@ -278,7 +269,7 @@ function _default(context) {
   }
   this.getDashboard = globalAppTabs;
   async function getDashboardItems() {
-    const me = _solidLogicJss.authn.currentUser();
+    const me = authn.currentUser();
     if (!me) return [];
     const div = dom.createElement('div');
     const [books, pods] = await Promise.all([getAddressBooks(), getPods()]);
@@ -415,7 +406,7 @@ function _default(context) {
     });
 
     // close the dashboard if user log out
-    _solidLogicJss.authSession.events.on('logout', closeDashboard);
+    authSession.events.on('logout', closeDashboard);
 
     // finally - switch to showing dashboard
     outlineContainer.style.display = 'none';
@@ -535,25 +526,48 @@ function _default(context) {
                 }
               };
               const renderPane = function (pane) {
-                let paneDiv;
                 UI.log.info('outline: Rendering pane (2): ' + pane.name);
-                try {
-                  paneDiv = pane.render(subject, context, options);
-                } catch (e) {
-                  // Easier debugging for pane developers
-                  paneDiv = dom.createElement('div');
-                  paneDiv.setAttribute('class', 'exceptionPane');
-                  const pre = dom.createElement('pre');
-                  paneDiv.appendChild(pre);
-                  pre.appendChild(dom.createTextNode(UI.utils.stackString(e)));
-                }
-                if (pane.requireQueryButton && dom.getElementById('queryButton')) {
-                  dom.getElementById('queryButton').removeAttribute('style');
-                }
                 const second = containingTable.firstChild.nextSibling;
                 const row = dom.createElement('tr');
                 const cell = row.appendChild(dom.createElement('td'));
-                cell.appendChild(paneDiv);
+
+                // Helper to handle the rendered result
+                const handleRendered = paneDiv => {
+                  cell.appendChild(paneDiv);
+                  if (pane.requireQueryButton && dom.getElementById('queryButton')) {
+                    dom.getElementById('queryButton').removeAttribute('style');
+                  }
+                };
+
+                // Helper for errors
+                const handleError = e => {
+                  const errorDiv = dom.createElement('div');
+                  errorDiv.setAttribute('class', 'exceptionPane');
+                  const pre = dom.createElement('pre');
+                  errorDiv.appendChild(pre);
+                  pre.appendChild(dom.createTextNode(UI.utils.stackString(e)));
+                  return errorDiv;
+                };
+                try {
+                  const result = pane.render(subject, context, options);
+                  // Handle async render (returns Promise)
+                  if (result && typeof result.then === 'function') {
+                    const loading = dom.createElement('div');
+                    loading.textContent = 'Loading ' + pane.name + '...';
+                    cell.appendChild(loading);
+                    result.then(paneDiv => {
+                      cell.removeChild(loading);
+                      handleRendered(paneDiv);
+                    }).catch(e => {
+                      cell.removeChild(loading);
+                      handleRendered(handleError(e));
+                    });
+                  } else {
+                    handleRendered(result);
+                  }
+                } catch (e) {
+                  handleRendered(handleError(e));
+                }
                 if (second) containingTable.insertBefore(row, second);else containingTable.appendChild(row);
                 row.pane = pane;
                 row.paneButton = ico;
@@ -674,26 +688,50 @@ function _default(context) {
       expandedHeaderTR(subject, pane, options).then(tr1 => {
         table.appendChild(tr1);
         if (tr1.firstPane) {
-          let paneDiv;
-          try {
-            UI.log.info('outline: Rendering pane (1): ' + tr1.firstPane.name);
-            paneDiv = tr1.firstPane.render(subject, context, options);
-          } catch (e) {
-            // Easier debugging for pane developers
-            paneDiv = dom.createElement('div');
-            paneDiv.setAttribute('class', 'exceptionPane');
-            const pre = dom.createElement('pre');
-            paneDiv.appendChild(pre);
-            pre.appendChild(dom.createTextNode(UI.utils.stackString(e)));
-          }
+          const pane = tr1.firstPane;
+          UI.log.info('outline: Rendering pane (1): ' + pane.name);
           const row = dom.createElement('tr');
           const cell = row.appendChild(dom.createElement('td'));
-          cell.appendChild(paneDiv);
-          if (tr1.firstPane.requireQueryButton && dom.getElementById('queryButton')) {
-            dom.getElementById('queryButton').removeAttribute('style');
+
+          // Helper to handle the rendered result
+          const handleRendered = paneDiv => {
+            cell.appendChild(paneDiv);
+            if (pane.requireQueryButton && dom.getElementById('queryButton')) {
+              dom.getElementById('queryButton').removeAttribute('style');
+            }
+          };
+
+          // Helper for errors
+          const handleError = e => {
+            const errorDiv = dom.createElement('div');
+            errorDiv.setAttribute('class', 'exceptionPane');
+            const pre = dom.createElement('pre');
+            errorDiv.appendChild(pre);
+            pre.appendChild(dom.createTextNode(UI.utils.stackString(e)));
+            return errorDiv;
+          };
+          try {
+            const result = pane.render(subject, context, options);
+            // Handle async render (returns Promise)
+            if (result && typeof result.then === 'function') {
+              const loading = dom.createElement('div');
+              loading.textContent = 'Loading ' + pane.name + '...';
+              cell.appendChild(loading);
+              result.then(paneDiv => {
+                cell.removeChild(loading);
+                handleRendered(paneDiv);
+              }).catch(e => {
+                cell.removeChild(loading);
+                handleRendered(handleError(e));
+              });
+            } else {
+              handleRendered(result);
+            }
+          } catch (e) {
+            handleRendered(handleError(e));
           }
           table.appendChild(row);
-          row.pane = tr1.firstPane;
+          row.pane = pane;
           row.paneButton = tr1.paneButton;
         }
       });
@@ -1016,14 +1054,14 @@ function _default(context) {
         // if (term.termType != 'symbol') { return true } // should always ve
         if (req === fireOn) {
           target.src = icon;
-          target.title = _outlineIcons.outlineIcons.tooltips[icon];
+          target.title = outlineIcons.tooltips[icon];
         }
         return true;
       };
     };
-    sf.addCallback('request', makeIconCallback(_outlineIcons.outlineIcons.src.icon_requested));
-    sf.addCallback('done', makeIconCallback(_outlineIcons.outlineIcons.src.icon_fetched));
-    sf.addCallback('fail', makeIconCallback(_outlineIcons.outlineIcons.src.icon_failed));
+    sf.addCallback('request', makeIconCallback(outlineIcons.src.icon_requested));
+    sf.addCallback('done', makeIconCallback(outlineIcons.src.icon_fetched));
+    sf.addCallback('fail', makeIconCallback(outlineIcons.src.icon_failed));
   }
 
   //   Selection support
@@ -1039,19 +1077,19 @@ function _default(context) {
     // outlineIcons.src.icon_opton  needed?
     const target = thisOutline.targetOf(e);
     const p = target.parentNode;
-    termWidget.replaceIcon(p.parentNode, _outlineIcons.outlineIcons.termWidgets.optOn, _outlineIcons.outlineIcons.termWidgets.optOff, optOffIconMouseDownListener);
+    termWidget.replaceIcon(p.parentNode, outlineIcons.termWidgets.optOn, outlineIcons.termWidgets.optOff, optOffIconMouseDownListener);
     p.parentNode.parentNode.removeAttribute('optional');
   }
   function optOffIconMouseDownListener(e) {
     // outlineIcons.src.icon_optoff needed?
     const target = thisOutline.targetOf(e);
     const p = target.parentNode;
-    termWidget.replaceIcon(p.parentNode, _outlineIcons.outlineIcons.termWidgets.optOff, _outlineIcons.outlineIcons.termWidgets.optOn, optOnIconMouseDownListener);
+    termWidget.replaceIcon(p.parentNode, outlineIcons.termWidgets.optOff, outlineIcons.termWidgets.optOn, optOnIconMouseDownListener);
     p.parentNode.parentNode.setAttribute('optional', 'true');
   }
   function setSelectedParent(node, inc) {
-    const onIcon = _outlineIcons.outlineIcons.termWidgets.optOn;
-    const offIcon = _outlineIcons.outlineIcons.termWidgets.optOff;
+    const onIcon = outlineIcons.termWidgets.optOn;
+    const offIcon = outlineIcons.termWidgets.optOff;
     for (let n = node; n.parentNode; n = n.parentNode) {
       while (true) {
         if (n.getAttribute('predTR')) {
@@ -1138,14 +1176,14 @@ function _default(context) {
         // don't do these for headers or base nodes
         const source = st.why;
         // var target = st.why
-        const editable = _solidLogicJss.store.updater.editable(source.uri, kb);
+        const editable = store.updater.editable(source.uri, kb);
         if (!editable) {
           // let target = node.parentNode.AJAR_inverse ? st.object : st.subject
         } // left hand side
         // think about this later. Because we update to the why for now.
         // alert('Target='+target+', editable='+editable+'\nselected statement:' + st)
         if (editable && cla.indexOf('pred') >= 0) {
-          termWidget.addIcon(node, _outlineIcons.outlineIcons.termWidgets.addTri);
+          termWidget.addIcon(node, outlineIcons.termWidgets.addTri);
         } // Add blue plus
       }
     } else {
@@ -1156,7 +1194,7 @@ function _default(context) {
         setSelectedParent(node, -1);
       }
       if (cla.indexOf('pred') >= 0) {
-        termWidget.removeIcon(node, _outlineIcons.outlineIcons.termWidgets.addTri);
+        termWidget.removeIcon(node, outlineIcons.termWidgets.addTri);
       }
       selection = selection.filter(function (x) {
         return x === node;
@@ -1284,7 +1322,7 @@ function _default(context) {
           // I don't know why 'HTML'
           const object = UI.utils.getAbout(kb, selectedTd);
           target = selectedTd.parentNode.AJAR_statement.why;
-          editable = _solidLogicJss.store.updater.editable(target.uri, kb);
+          editable = store.updater.editable(target.uri, kb);
           if (object) {
             // <Feature about='enterToExpand'>
             outline.GotoSubject(object, true);
@@ -1337,7 +1375,7 @@ function _default(context) {
       case 8:
         // backspace
         target = selectedTd.parentNode.AJAR_statement.why;
-        editable = _solidLogicJss.store.updater.editable(target.uri, kb);
+        editable = store.updater.editable(target.uri, kb);
         if (editable) {
           e.preventDefault(); // prevent from going back
           this.UserInput.Delete(selectedTd);
@@ -1568,7 +1606,7 @@ function _default(context) {
       if (node.parentNode) st = node.parentNode.AJAR_statement;
       if (!st) return; // For example in the title TD of an expanded pane
       const target = st.why;
-      const editable = _solidLogicJss.store.updater.editable(target.uri, kb);
+      const editable = store.updater.editable(target.uri, kb);
       if (sel && editable) thisOutline.UserInput.Click(e, selection[0]); // was next 2 lines
       // var text='TabulatorMouseDown@Outline()';
       // HCIoptions['able to edit in Discovery Mode by mouse'].setupHere([sel,e,thisOutline,selection[0]],text);
@@ -1608,10 +1646,10 @@ function _default(context) {
     // if (typeof rav=='undefined') //uncomment this for javascript2rdf
     // have to put this here or this conflicts with deselectAll()
 
-    if (!target.src || target.src.slice(target.src.indexOf('/icons/') + 1) !== _outlineIcons.outlineIcons.src.icon_show_choices && target.src.slice(target.src.indexOf('/icons/') + 1) !== _outlineIcons.outlineIcons.src.icon_add_triple) {
+    if (!target.src || target.src.slice(target.src.indexOf('/icons/') + 1) !== outlineIcons.src.icon_show_choices && target.src.slice(target.src.indexOf('/icons/') + 1) !== outlineIcons.src.icon_add_triple) {
       thisOutline.UserInput.clearInputAndSave(e);
     }
-    if (!target.src || target.src.slice(target.src.indexOf('/icons/') + 1) !== _outlineIcons.outlineIcons.src.icon_show_choices) {
+    if (!target.src || target.src.slice(target.src.indexOf('/icons/') + 1) !== outlineIcons.src.icon_show_choices) {
       thisOutline.UserInput.clearMenu();
     }
     if (e) e.stopPropagation();
@@ -1899,7 +1937,7 @@ function _default(context) {
   // / /////////////////////////////////////////////////////
 
   const ns = UI.ns;
-  const views = (0, _propertyViews.propertyViews)(dom);
+  const views = propertyViews(dom);
 
   // var thisOutline = this   dup
   /** some builtin simple views **/
@@ -1935,7 +1973,7 @@ function _default(context) {
           const anchor = dom.createElement('a');
           rep.appendChild(dom.createTextNode(num));
           anchor.setAttribute('href', obj.uri);
-          anchor.appendChild(UI.utils.AJARImage(_outlineIcons.outlineIcons.src.icon_telephone, 'phone', 'phone ' + num, dom));
+          anchor.appendChild(UI.utils.AJARImage(outlineIcons.src.icon_telephone, 'phone', 'phone ' + num, dom));
           rep.appendChild(anchor);
           anchor.firstChild.setAttribute('class', 'phoneIcon');
         } else {

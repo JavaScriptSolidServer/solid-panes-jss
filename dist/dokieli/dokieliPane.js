@@ -1,24 +1,19 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var $rdf = _interopRequireWildcard(require("rdflib"));
-var mime = _interopRequireWildcard(require("../utils/mimeTypes"));
-var _new = _interopRequireDefault(require("./new.js"));
-function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /*   Human-readable editable "Dokieli" Pane
  **
  **  This outline pane contains the document contents for a Dokieli document
  ** The dokeili system allows the user to edit a document including anotations
  ** review.   It does not use turtle, but RDF/a
  */
+
+import * as UI from 'solid-ui-jss';
+import * as $rdf from 'rdflib';
+import * as mime from '../utils/mimeTypes';
+
 // const DOKIELI_TEMPLATE_URI = 'https://dokie.li/new' // Copy to make new dok
-// Distributed with this library
-var _default = exports.default = {
+
+import DOKIELI_TEMPLATE from './new.js'; // Distributed with this library
+
+export default {
   icon: UI.icons.iconBase + 'dokieli-logo.png',
   // @@ improve? more like doccument?
 
@@ -88,7 +83,7 @@ var _default = exports.default = {
 
     // console.log('New dokieli will make: ' + newInstance)
 
-    let htmlContents = _new.default;
+    let htmlContents = DOKIELI_TEMPLATE;
     let filename = newInstance.uri.split('/').slice(-1)[0];
     filename = decodeURIComponent(filename.split('.')[0]);
     const encodedTitle = filename.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -165,5 +160,6 @@ var _default = exports.default = {
     div.appendChild(tr);
     return div;
   }
-}; // ends
+};
+// ends
 //# sourceMappingURL=dokieliPane.js.map

@@ -3,7 +3,9 @@ export default {
     ['@babel/preset-env', {
       targets: {
         browsers: ['> 1%', 'last 3 versions', 'not dead']
-      }
+      },
+      // Preserve import() for webpack code splitting
+      modules: false
     }],
     '@babel/preset-typescript'
   ],

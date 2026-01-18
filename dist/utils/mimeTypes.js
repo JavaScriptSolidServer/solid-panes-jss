@@ -1,10 +1,3 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = void 0;
-exports.lookup = lookup;
 /**
  * Lightweight MIME type lookup
  * Replaces the heavy mime-types package (146KB)
@@ -39,12 +32,12 @@ const extToMime = {
   // Documents
   pdf: 'application/pdf'
 };
-function lookup(filename) {
+export function lookup(filename) {
   const ext = filename.split('.').pop()?.toLowerCase();
   if (!ext) return false;
   return extToMime[ext] || false;
 }
-var _default = exports.default = {
+export default {
   lookup
 };
 //# sourceMappingURL=mimeTypes.js.map

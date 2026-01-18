@@ -1,20 +1,13 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.formPane = void 0;
-var UI = _interopRequireWildcard(require("solid-ui-jss"));
-var _solidLogicJss = require("solid-logic-jss");
-var $rdf = _interopRequireWildcard(require("rdflib"));
-function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 /*
  **             Pane for running existing forms for any object
  **
  */
 
+import * as UI from 'solid-ui-jss';
+import { authn } from 'solid-logic-jss';
+import * as $rdf from 'rdflib';
 const ns = UI.ns;
-const formPane = exports.formPane = {
+export const formPane = {
   icon: UI.icons.iconBase + 'noun_122196.svg',
   name: 'form',
   audience: [ns.solid('PowerUser')],
@@ -50,7 +43,7 @@ const formPane = exports.formPane = {
 
     // const t = kb.findTypeURIs(subject)
 
-    const me = _solidLogicJss.authn.currentUser();
+    const me = authn.currentUser();
     const box = dom.createElement('div');
     box.setAttribute('class', 'formPane');
     if (!me) {

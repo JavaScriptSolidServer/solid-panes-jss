@@ -1,14 +1,8 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = exports.dashboardPane = void 0;
-var _solidUiJss = require("solid-ui-jss");
-var _solidLogicJss = require("solid-logic-jss");
-var _homepage = require("./homepage");
-const dashboardPane = exports.dashboardPane = {
-  icon: _solidUiJss.icons.iconBase + 'noun_547570.svg',
+import { icons } from 'solid-ui-jss';
+import { authn, authSession, store } from 'solid-logic-jss';
+import { generateHomepage } from './homepage';
+export const dashboardPane = {
+  icon: icons.iconBase + 'noun_547570.svg',
   name: 'dashboard',
   label: subject => {
     console.log();
@@ -23,13 +17,13 @@ const dashboardPane = exports.dashboardPane = {
     const container = dom.createElement('div');
     const runBuildPage = () => {
       container.innerHTML = '';
-      buildPage(container, _solidLogicJss.authn.currentUser() || null, context, subject);
+      buildPage(container, authn.currentUser() || null, context, subject);
     };
-    _solidLogicJss.authSession.events.on('login', () => {
+    authSession.events.on('login', () => {
       // console.log('On Login')
       runBuildPage();
     });
-    _solidLogicJss.authSession.events.on('sessionRestore', () => {
+    authSession.events.on('sessionRestore', () => {
       // console.log('On Session Restore')
       runBuildPage();
     });
@@ -63,7 +57,7 @@ function buildHomePage(container, subject) {
   link.rel = 'stylesheet';
   link.href = '/common/css/bootstrap.min.css';
   shadow.appendChild(link);
-  (0, _homepage.generateHomepage)(subject, _solidLogicJss.store, _solidLogicJss.store.fetcher).then(homepage => shadow.appendChild(homepage));
+  generateHomepage(subject, store, store.fetcher).then(homepage => shadow.appendChild(homepage));
 }
-var _default = exports.default = dashboardPane;
+export default dashboardPane;
 //# sourceMappingURL=dashboardPane.js.map
